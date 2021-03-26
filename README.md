@@ -3,6 +3,7 @@ COSC 2354 Team Project-Spring 2021
 
 Classses:
 -> Client Class(Might inherit from Server Class)
+
 -> Server Class
 
 Methods:
