@@ -11,7 +11,7 @@
 
 ### Methods:
 
-**-> Client variables & methods: ** 
+**-> Client variables & methods:** 
 
 Update:
        
