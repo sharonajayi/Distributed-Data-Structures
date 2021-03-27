@@ -13,15 +13,15 @@ Methods:
 
 -> Client variables & methods: 
 
-Update
-       {
+Update:
+       
        
        add() -appends to the end of the linked list
        
        insert() -add int in a specified index of the liked list
        
        delete() -removes int in a specified index of the linked list
-       }
+       
 
 rollback() -loads the last committed version
 
