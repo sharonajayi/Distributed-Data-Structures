@@ -1,7 +1,7 @@
 # Distributed-Data-Structures
-COSC 2354 Team Project-Spring 2021
+## COSC 2354 Team Project-Spring 2021
 
-Classses:
+### Classses:
 
 -> Client Class(Might inherit from Server Class)
 
@@ -9,9 +9,9 @@ Classses:
 
 -> GlobalClock Class
 
-Methods:
+### Methods:
 
--> Client variables & methods: 
+**-> Client variables & methods: ** 
 
 Update:
        
@@ -29,7 +29,7 @@ view() -retives the data structure
 
 commit() -load the latest version to disk
 
--> Server variables & methods:
+**-> Server variables & methods:**
 
 Linked List<int>
 
@@ -43,7 +43,7 @@ replicate() -push update to other servers and commit to the disk
 
 check() -check if each server has the latest update (i.e compares the linked list of each server)
 
--> GlobalClock variables & methods
+**-> GlobalClock variables & methods:**
 
 .......
 
