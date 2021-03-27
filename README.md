@@ -2,9 +2,12 @@
 COSC 2354 Team Project-Spring 2021
 
 Classses:
+
 -> Client Class(Might inherit from Server Class)
 
 -> Server Class
+
+-> GlobalClock Class
 
 Methods:
 
@@ -12,6 +15,7 @@ Methods:
 
 Update
        {
+       
        add() -appends to the end of the linked list
        
        insert() -add int in a specified index of the liked list
@@ -38,6 +42,10 @@ Array (String[]) of size 3
 replicate() -push update to other servers and commit to the disk
 
 check() -check if each server has the latest update (i.e compares the linked list of each server)
+
+-> GlobalClock variables & methods
+
+.......
 
 Others:
 
