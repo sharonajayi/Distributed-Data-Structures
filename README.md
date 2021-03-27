@@ -28,8 +28,10 @@ Linked List<int>
 
 Static variable that holds all Server objects: used to find which servers need to be updated
 
-Array (String[]): //Couldn't see what Nadine wrote
-
+Array (String[]) of size 3
+- [0] = IP address 
+- [1] = update that occured
+- [2] = time stamp
 replicate() -push update to other servers and commit to the disk
 
 check() -check if each server has the latest update (i.e compares the linked list of each server)
