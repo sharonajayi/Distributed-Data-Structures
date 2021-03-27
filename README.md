@@ -10,7 +10,8 @@ Methods:
 
 -> Client variables & methods: 
 
-Update{add() -appends to the end of the linked list
+Update{
+add() -appends to the end of the linked list
        
        insert() -add int in a specified index of the liked list
        
