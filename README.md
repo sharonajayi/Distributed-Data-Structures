@@ -3,7 +3,7 @@
 
 ### Classses:
 
--> Client Class(Might inherit from Server Class)
+-> Client Class
 
 -> Server Class
 
