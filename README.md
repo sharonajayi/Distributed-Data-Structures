@@ -61,7 +61,19 @@ Constructors:
               
                      case "A": message = "Update: add " + value; break;
                      
-                     case "D": message = "Updare: delete " + value; break;
+                     case "D": message = "Update: delete " + value; break;
+                     
+                     }
+       
+       }
+       
+       Message(String met,{
+       
+              switch(met){
+              
+                     case "C": message = "Commit to disk "; break;
+                     
+                     case "R": message = "Rollback"; break;
                      
                      }
        
