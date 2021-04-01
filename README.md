@@ -54,11 +54,17 @@ Variables:
        [] public String message
 
 Constructors:
+
        Message(String met, int value){
+       
               switch(met){
+              
                      case "A": message = "Update: add " + value; break;
+                     
                      case "D": message = "Updare: delete " + value; break;
+                     
                      }
+       
        }
 
 Others:
