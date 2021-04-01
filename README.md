@@ -78,7 +78,12 @@ Constructors:
                      }
        
        }
-
+       
+       Message(int pos, int value){
+       
+              message = "Update: " + value + " at position " + pos;
+       
+       }
 Others:
 
 
