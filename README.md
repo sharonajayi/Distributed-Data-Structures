@@ -47,7 +47,8 @@ check() -check if each server has the latest update (i.e compares the linked lis
 
 **-> GlobalClock variables & methods:**
 
-.......
+--Might not need this class--
+other options at this [website](https://stackabuse.com/how-to-get-current-date-and-time-in-java/)
 
 **-> Message variables & methods: **
 Variables:
