@@ -9,7 +9,9 @@
 
 -> GlobalClock Class
 
-### Methods:
+-> Message Class
+
+### Methods & Variables:
 
 **-> Client variables & methods:** 
 
@@ -47,6 +49,18 @@ check() -check if each server has the latest update (i.e compares the linked lis
 
 .......
 
+**-> Message variables & methods: **
+Variables:
+       [] public String message
+
+Constructors:
+       Message(String met, int value){
+              switch(met){
+                     case "A": message = "Update: add " + value; break;
+                     case "D": message = "Updare: delete " + value; break;
+                     }
+       }
+
 Others:
 
--> Might need to use threads.
+
