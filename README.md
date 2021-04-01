@@ -25,7 +25,7 @@ Update:
        delete() -removes int in a specified index of the linked list
        
 
-rollback() -loads the last committed version
+rollback() -loads the last committed version (only occurs one time)
 
 view() -retives the data structure
 
