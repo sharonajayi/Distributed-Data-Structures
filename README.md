@@ -33,28 +33,41 @@ commit() -load the latest version to disk
 
 **-> Server variables & methods:**
 
-private LinkedList<Integer> data - hold all the data the client wants
+private LinkedList<Integer> data
+       
+       - hold all the data the client wants
 
-private Hastable<Integer, LinkedList<Integer>> - hold the data each client commited
+private Hastable<Integer, LinkedList<Integer>> 
+       
+       - hold the data each client commited
        
 private Date timeStamp
 
 protected boolean available
 
 private static ArrayList<EchoServers> allServers
+       
        - Static variable that holds all Server objects: used to find which servers need to be updated
 
 
 private ArrayList<String[]> memoryLog
 
+       Array (String[]) of size 3
+       - [0] = IP address 
+       - [1] = update that occured
+       - [2] = time stamp
 
-Array (String[]) of size 3
-- [0] = IP address 
-- [1] = update that occured
-- [2] = time stamp
-replicate() -push update to other servers and commit to the disk
+replicate()
 
-check() -check if each server has the latest update (i.e compares the linked list of each server)
+       -push update to other servers and commit to the disk
+
+check() 
+       
+       -check if each server has the latest update (i.e compares the linked list of each server)
+
+updateServer()
+
+       - updates EchoClient command to  server and use replicate() to update the other serevers 
 
 **-> GlobalClock variables & methods:**
 
