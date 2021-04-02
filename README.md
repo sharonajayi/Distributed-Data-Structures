@@ -36,7 +36,7 @@ Update:
 protected void rollback() 
        
        -loads the last committed version (only occurs one time)
-       -it can only be called once by the method
+       -it can only be called once by the client
 
 protected LinkedList<integer> view() 
        
