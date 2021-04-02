@@ -33,9 +33,20 @@ commit() -load the latest version to disk
 
 **-> Server variables & methods:**
 
-Linked List<int>
+private LinkedList<Integer> data - hold all the data the client wants
 
-Static variable that holds all Server objects: used to find which servers need to be updated
+private Hastable<Integer, LinkedList<Integer>> - hold the data each client commited
+       
+private Date timeStamp
+
+protected boolean available
+
+private static ArrayList<EchoServers> allServers
+       - Static variable that holds all Server objects: used to find which servers need to be updated
+
+
+private ArrayList<String[]> memoryLog
+
 
 Array (String[]) of size 3
 - [0] = IP address 
