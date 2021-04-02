@@ -3,11 +3,11 @@
 
 ### Classses:
 
--> Client Class
+-> EchoClient Class
 
--> Server Class
+-> EchoServer Class
 
--> GlobalClock Class
+-> GlobalClock Class (not really needed)
 
 -> Message Class
 
@@ -15,21 +15,35 @@
 
 **-> Client variables & methods:** 
 
+public int ClientIP
+
 Update:
        
        
-       add() -appends to the end of the linked list
+       protected void add(int value) 
        
-       insert() -add int in a specified index of the liked list
+              -appends to the end of the linked list
        
-       delete() -removes int in a specified index of the linked list
+       protected void insert(int post, int value) 
+       
+              -add int in a specified index of the liked list
+       
+       protected void delete(int value) 
+       
+              -removes int in a specified index of the linked list
        
 
-rollback() -loads the last committed version (only occurs one time)
+protected void rollback() 
+       
+       -loads the last committed version (only occurs one time)
 
-view() -retives the data structure
+protected LinkedList<integer> view() 
+       
+       -retives the data structure
 
-commit() -load the latest version to disk
+protected boolean commit() 
+       
+       -load the latest version to disk
 
 **-> Server variables & methods:**
 
@@ -57,15 +71,15 @@ private ArrayList<String[]> memoryLog
        - [1] = update that occured
        - [2] = time stamp
 
-replicate()
+private void replicate()
 
        -push update to other servers and commit to the disk
 
-check() 
+private boolean check() 
        
        -check if each server has the latest update (i.e compares the linked list of each server)
 
-updateServer()
+public void updateServer()
 
        - updates EchoClient command to  server and use replicate() to update the other serevers 
 
