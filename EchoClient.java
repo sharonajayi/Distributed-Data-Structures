@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;   // Used to read objects sent from the server
 import java.io.ObjectOutputStream;  // Used to write objects to the server
 import java.io.BufferedReader;      // Needed to read from the console
 import java.io.InputStreamReader;   // Needed to read from the console
+import java.util.LinkedList;
 
 
 /**
@@ -16,6 +17,60 @@ import java.io.InputStreamReader;   // Needed to read from the console
  */
 public class EchoClient
 {
+    /**
+     *IP address for the client
+     */
+    public int clientIP;
+    
+    /**rollback method.
+     * loads the last committed version (only occurs once)
+     * it can only be called once by the client
+     */
+    protected void rollback(){
+        
+    }
+    
+    /**view method.
+     * retrieves the linked list data structure
+     * @return linked list of integers
+     */
+    protected LinkedList<Integer> view(){
+        return new LinkedList<Integer>();
+    }
+    
+    /**commit method.
+     *loads the latest version to the disk
+     * @return true if user wants to save the new version
+     */
+    protected boolean commit(){
+        return true;
+    }
+    
+    /**insert method.
+     *adds integer at a specified index
+     * @param pos Index of the linked list
+     * @param value Integer to be added
+     */
+    protected void insert(int pos, int value){
+        
+    }
+    
+    /**delete method.
+     *removes a specified integer
+     * @param value Integer to be removed
+     */
+    protected void delete(int value){
+        
+    }
+    
+    /**add method.
+     *appends to the end of the linked list
+     * @param value Integer to be appended
+     */
+    protected void add(int value){
+        
+    }
+    
     /**
      * Main method.
      * @param args  First argument specifies the server to connect to
