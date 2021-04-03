@@ -30,7 +30,7 @@ Update:
        
        protected void delete(int value) 
        
-              -removes int in a specified index of the linked list
+              -removes a specified integer
        
 
 protected void rollback() 
