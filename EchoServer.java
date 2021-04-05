@@ -38,7 +38,7 @@ public class EchoServer
     private LinkedList<Integer> data;
     
     /**replicate method.
-     * push update to other server and commit to disk
+     * push update to other servers
      */
     private void replicate(){
         
