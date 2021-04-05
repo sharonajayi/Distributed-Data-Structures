@@ -74,7 +74,7 @@ private ArrayList<String[]> memoryLog
 
 private void replicate()
 
-       -push update to other servers and commit to the disk
+       -push update to other servers
 
 private boolean check() 
        
