@@ -52,7 +52,7 @@ private LinkedList<Integer> data
        
        - hold all the data the client wants
 
-private Hastable<Integer, LinkedList<Integer>> 
+private static Hastable<Integer, LinkedList<Integer>> commitedData 
        
        - hold the data each client commited
        
