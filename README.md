@@ -72,9 +72,9 @@ private ArrayList<String[]> memoryLog
        - [1] = update that occured
        - [2] = time stamp
 
-private void replicate()
+private void replicate() (might not need this)
 
-       -push update to other servers
+       -push update to other servers so call basically enacts the updapre on the other servers 
 
 private boolean check() 
        
