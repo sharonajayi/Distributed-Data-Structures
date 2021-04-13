@@ -30,7 +30,7 @@ Update:
        
        protected void delete(int value) 
        
-              -removes a specified integer
+              -removes a specified integer - delete by index instead of value so we don't have to search for value to delete and account for multiple of the same value
        
 
 protected void rollback() 
