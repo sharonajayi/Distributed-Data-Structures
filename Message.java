@@ -20,7 +20,31 @@ public class Message implements java.io.Serializable
      *
      */
     public Message(String _msg){
-	theMessage = _msg;
+	switch(_msg)
+        {
+
+            case "C": theMessage = "Commit to disk "; break;
+
+            case "R": theMessage = "Rollback"; break;
+
+        }
+    }
+    
+    public Message(String met, int value){
+       
+        switch(met)
+        {
+            case "A": theMessage = "Update: add " + value; break;
+
+            case "D": theMessage = "Update: delete " + value; break;
+
+        }
+  
+    }
+    
+    public Message(int pos, int value){
+        
+        theMessage = "Update: " + value + " at position " + pos;
     }
 
 }  //-- End class Message
