@@ -20,7 +20,7 @@ public class EchoServer
     public static final int SERVER_PORT = 8754;
     
     /*disk hashtable that contains Integer and linked list of integers*/
-    private Hashtable<Integer,LinkedList<Integer>> disk;
+    private static Hashtable<Integer,LinkedList<Integer>> disk;
     
     /*time stamp variable*/
     Date timeStamp;
@@ -35,7 +35,7 @@ public class EchoServer
     private ArrayList<String[]> memoryLog;
     
     /*linked list of integers*/
-    private LinkedList<Integer> data;
+    private static LinkedList<Integer> data;
     
     /**replicate method.
      * push update to other servers
