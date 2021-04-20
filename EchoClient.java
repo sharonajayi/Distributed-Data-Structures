@@ -3,8 +3,8 @@ package server_sample;
 import java.net.Socket;             // Used to connect to the server
 import java.io.ObjectInputStream;   // Used to read objects sent from the server
 import java.io.ObjectOutputStream;  // Used to write objects to the server
-import java.io.BufferedReader;      // Needed to read from the console
-import java.io.InputStreamReader;   // Needed to read from the console
+import java.io.BufferedReader;      // Needed to read from the console (user input)
+import java.io.InputStreamReader;   // Needed to read from the console (user input)
 import java.util.LinkedList;
 
 
@@ -22,6 +22,15 @@ public class EchoClient
      */
     public int clientIP;
     
+    /**
+     * Server the client is connected to
+     */
+    private EchoServer serv;
+    
+    public EchoClient(){
+        serv = new EchoServer();
+    }
+    
     /**rollback method.
      * loads the last committed version (only occurs once)
      * it can only be called once by the client
@@ -31,11 +40,11 @@ public class EchoClient
     }
     
     /**view method.
-     * retrieves the linked list data structure
+     * Retrieves the linked list data structure
      * @return linked list of integers
      */
     protected LinkedList<Integer> view(){
-        return new LinkedList<Integer>();
+        return new LinkedList<>();
     }
     
     /**commit method.
@@ -64,12 +73,21 @@ public class EchoClient
     }
     
     /**add method.
-     *appends to the end of the linked list
+     *appends to the end of the linked list and update the servers
      * @param value Integer to be appended
      */
-    protected void add(int value){
+    protected void add(int value){ 
+
+        //added the value to server
+        this.serv.getData().add(value);
+        
+        //update to all server
+        serv.updateServer(this.clientIP);
+        
+        //timestamp
         
     }
+    
     
     /**
      * Main method.
@@ -87,10 +105,10 @@ public class EchoClient
         
 	try{
 	    // Connect to the specified server
-            String serverIP = args[0];
-            int serverPort = Integer.valueOf(args[1]);
+            String serverIP = args[0]; //first thing type
+            int serverPort = Integer.valueOf(args[1]); //second thing typed
             
-	    final Socket sock = new Socket(serverIP, serverPort);
+	    final Socket sock = new Socket(serverIP, serverPort); //final for security reason, could redirct the traffic
 	    System.out.println("Connected to " + serverIP + " on port " + serverPort + 
                     " LocalPort number is: " + sock.getLocalPort());
 	    
@@ -116,7 +134,7 @@ public class EchoClient
 		// encode it as a Message.  Note that we need to
 		// explicitly cast the return from readObject() to the
 		// type Message.
-		resp = (Message)input.readObject();
+		resp = (Message)input.readObject(); //readOject() is a blocking method
 		System.out.println("\nServer says: " + resp.theMessage + "\n");
                                 
 	    }while(!msg.theMessage.toUpperCase().equals("EXIT"));
@@ -152,5 +170,7 @@ public class EchoClient
 	}
 
     } //-- end readSomeText()
+    
+    
 
 } //-- end class EchoClient
