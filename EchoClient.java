@@ -71,12 +71,11 @@ public class EchoClient
     
     /**delete method.
      *removes a specified integer
-     * @param value Integer to be removed
+     * @param index Integer index to be removed
      */
-    protected void delete(int value){
+    protected void delete(int index){
         //delete the value from the server
-        //Wrapped the value in and Integer object
-        this.serv.getData().remove(new Integer(value));
+        this.serv.getData().remove(index);
         //update to all server
         serv.updateServer(this.clientIP);
         
