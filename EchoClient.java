@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;  // Used to write objects to the server
 import java.io.BufferedReader;      // Needed to read from the console (user input)
 import java.io.InputStreamReader;   // Needed to read from the console (user input)
 import java.util.LinkedList;
+import java.util.Scanner;
 
 
 /**
@@ -115,19 +116,23 @@ public class EchoClient
 	    // Set up I/O streams with the server
 	    final ObjectOutputStream output = new ObjectOutputStream(sock.getOutputStream());
 	    final ObjectInputStream input = new ObjectInputStream(sock.getInputStream());
-
+            
+            
+            EchoClient c1 = new EchoClient();
 	    // loop to send messages
 	    Message msg = null, resp = null;
             Message resp2 = null;
+//            System.out.println("Enter a line of text, or type \"EXIT\" to quit.");
+//	    System.out.print(" > ");
 	    do{
 		// Read and send message.  Since the Message class
 		// implements the Serializable interface, the
 		// ObjectOutputStream "output" object automatically
 		// encodes the Message object into a format that can
 		// be transmitted over the socket to the server.
-		msg = new Message(readSomeText());
-		output.writeObject(msg);
-
+		msg = readSomeText(c1,msg);
+		output.writeObject(msg);   
+                   
 		// Get ACK and print.  Since Message implements
 		// Serializable, the ObjectInputStream can
 		// automatically read this object off of the wire and
@@ -160,7 +165,9 @@ public class EchoClient
     {
 	try{
 	    System.out.println("Enter a line of text, or type \"EXIT\" to quit.");
-	    System.out.print(" > ");	
+	    System.out.print(" > ");
+            System.out.println("First run");
+            
 	    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 	    return in.readLine();
 	}
@@ -171,6 +178,30 @@ public class EchoClient
 
     } //-- end readSomeText()
     
-    
+    private static Message readSomeText(EchoClient c1, Message msg){
+        try{
+        System.out.println("Enter a line of text, or type \"EXIT\" to quit.");
+        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Do you want to add data to the server? (y/n): ");
+        String request = sc.nextLine();
+        if(request.equalsIgnoreCase("y")){
+            System.out.println("Input your data: ");
+            String ans = in.readLine();
+            if(ans.equalsIgnoreCase("EXIT"))
+                return new Message(ans);
+            int adding  = Integer.parseInt(ans);
+            c1.add(adding);
+            msg = new Message("A", adding);
+
+        }
+        }
+        catch(Exception e){
+	    // Uh oh...
+            msg = new Message ("");
+	    return msg;
+        }
+        return msg;
+    }
 
 } //-- end class EchoClient

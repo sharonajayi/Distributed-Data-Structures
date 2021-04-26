@@ -1,5 +1,4 @@
 package server_sample;
-
 /**
  * Marian Zaki (COSC 2354)
  * Very primitive-simple message class.  By implementing the Serializble
@@ -26,8 +25,12 @@ public class Message implements java.io.Serializable
             case "C": theMessage = "Commit to disk "; break;
 
             case "R": theMessage = "Rollback"; break;
+            
+            default: 
+                theMessage = _msg;
 
         }
+        
     }
     
     public Message(String met, int value){
