@@ -61,7 +61,12 @@ public class EchoClient
      * @param value Integer to be added
      */
     protected void insert(int pos, int value){
+        this.serv.getData().add(pos, value);
         
+        //update to all server
+        serv.updateServer(this.clientIP);
+        
+        //timestamp
     }
     
     /**delete method.
@@ -69,7 +74,13 @@ public class EchoClient
      * @param value Integer to be removed
      */
     protected void delete(int value){
+        //delete the value from the server
+        //Wrapped the value in and Integer object
+        this.serv.getData().remove(new Integer(value));
+        //update to all server
+        serv.updateServer(this.clientIP);
         
+        //timestamp
     }
     
     /**add method.
