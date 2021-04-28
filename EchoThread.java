@@ -1,9 +1,10 @@
-package server_sample;
+package server;
 
 import java.lang.Thread;            // We will extend Java's base Thread class
 import java.net.Socket;
 import java.io.ObjectInputStream;   // For reading Java objects off of the wire
 import java.io.ObjectOutputStream;  // For writing Java objects to the wire
+import java.util.LinkedList;
 
 
 /**
@@ -15,7 +16,8 @@ import java.io.ObjectOutputStream;  // For writing Java objects to the wire
 public class EchoThread extends Thread
 {
     private final Socket socket;                   // The socket that we'll be talking over
-
+    
+    //private LinkedList<Integer> data;
     /**
      * Constructor that sets up the socket we'll chat over
      *
@@ -50,10 +52,29 @@ public class EchoThread extends Thread
 		// read and print message
 		msg = (Message)input.readObject();
 		System.out.println("[" + socket.getInetAddress() + ":" + socket.getPort() + "] " + msg.theMessage);
-
+                char command = msg.theMessage.charAt(0);
+                count++;
+                if(Character.compare(command, 'A') == 0){
+                    add(msg.getVal());
+                    output.writeObject(msg.theMessage);
+                    if(!EchoServer.status){
+                        System.out.println("Not adding correctly");
+                    }
+                }
+                else if(Character.compare(command, 'V') == 0){
+                    System.out.println("Printing data");
+                    output.writeChars(view());
+                    
+                }
+                else if(Character.compare(command, 'D') == 0){
+                    System.out.println("Deleting");
+                    delete(msg.getVal());
+                    output.writeObject(msg.theMessage);
+                }
+                
 		// Write an ACK back to the sender
-		count++;
-		output.writeObject(new Message("Recieved message #" + count));               
+		
+		               
 	    }while(!msg.theMessage.toUpperCase().equals("EXIT"));
 
 	    // Close and cleanup
@@ -67,5 +88,34 @@ public class EchoThread extends Thread
 	}
 
     }  //-- end run()
+    
+    
+    private void add(int value){
+        
+        EchoServer.data.add(value);
+        if(EchoServer.data.contains(value)){
+            EchoServer.status = true;
+        }
+//        else
+//            System.out.println("Value: " + value + " was not added" );
+    }
+    
+    private void delete(int value){
+        EchoServer.data.remove(value);
+    }
+    
+    private String view(){
+        StringBuilder str = new StringBuilder();
+        for(int i = 0; i < EchoServer.data.size(); i++){
+            if(i==0)
+                str.append("[").append(EchoServer.data.get(i)).append(" ");
+            else if(i == EchoServer.data.size() - 1)
+                str.append(EchoServer.data.get(i)).append("]");
+            else
+                str.append(EchoServer.data.get(i)).append(", ");
+        }
+        
+        return str.toString();
+    }
 
 } //-- end class EchoThread

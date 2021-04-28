@@ -1,4 +1,4 @@
-package server_sample;
+package server;
 
 import java.net.Socket;             // Used to connect to the server
 import java.io.ObjectInputStream;   // Used to read objects sent from the server
@@ -21,15 +21,15 @@ public class EchoClient
     /**
      *IP address for the client
      */
-    public int clientIP;
+    public String clientIP;
     
     /**
      * Server the client is connected to
      */
-    private EchoServer serv;
+    //private EchoServer serv;
     
-    public EchoClient(){
-        serv = new EchoServer();
+    public EchoClient(String IP){
+        this.clientIP = IP;
     }
     
     /**rollback method.
@@ -40,12 +40,12 @@ public class EchoClient
         
     }
     
-    /**view method.
-     * Retrieves the linked list data structure
-     * @return linked list of integers
+    /** * view method.Retrieves the linked list data structure and prints 
+     * it out the data the user had added in
+     * @return 
      */
-    protected LinkedList<Integer> view(){
-        return new LinkedList<>();
+    protected static Message view(){
+        return new Message("V");
     }
     
     /**commit method.
@@ -56,37 +56,32 @@ public class EchoClient
         return true;
     }
     
-    /**insert method.
-     *adds integer at a specified index
+    /**
+     * insert method.adds integer at a specified index
      * @param pos Index of the linked list
      * @param value Integer to be added
+     * @return 
      */
-    protected void insert(int pos, int value){
-        
+    protected static Message insert(int pos, int value){
+         return new Message(pos, value);
     }
     
-    /**delete method.
-     *removes a specified integer
+    /** * delete method.removes a specified integer
      * @param value Integer to be removed
+     * @return 
      */
-    protected void delete(int value){
-        
+    protected static Message delete(int value){
+         return new Message("D", value);
     }
     
-    /**add method.
-     *appends to the end of the linked list and update the servers
+    /**
+     * add method.
+     * appends to the end of the linked list and update the servers
      * @param value Integer to be appended
+     * @return 
      */
-    protected void add(int value){ 
-
-        //added the value to server
-        this.serv.getData().add(value);
-        
-        //update to all server
-        serv.updateServer(this.clientIP);
-        
-        //timestamp
-        
+    protected static Message add(int value){ 
+        return new Message("A", value);
     }
     
     
@@ -118,7 +113,7 @@ public class EchoClient
 	    final ObjectInputStream input = new ObjectInputStream(sock.getInputStream());
             
             
-            EchoClient c1 = new EchoClient();
+            EchoClient c1 = new EchoClient(serverIP);
 	    // loop to send messages
 	    Message msg = null, resp = null;
             Message resp2 = null;
@@ -185,16 +180,45 @@ public class EchoClient
         Scanner sc = new Scanner(System.in);
         System.out.println("Do you want to add data to the server? (y/n): ");
         String request = sc.nextLine();
+        if(request.equalsIgnoreCase("EXIT"))
+                return new Message(request);
         if(request.equalsIgnoreCase("y")){
             System.out.println("Input your data: ");
             String ans = in.readLine();
             if(ans.equalsIgnoreCase("EXIT"))
                 return new Message(ans);
-            int adding  = Integer.parseInt(ans);
-            c1.add(adding);
-            msg = new Message("A", adding);
+            else {
+                int adding  = Integer.parseInt(ans);
+                
+                return add(adding);
+            }
 
         }
+        
+        System.out.println("Do you want to view your data in the server? (y/n): ");
+        request = sc.nextLine();
+        if(request.equalsIgnoreCase("EXIT"))
+            return new Message(request);
+        if(request.equalsIgnoreCase("y")){
+            return view();
+        }
+        
+        System.out.println("Do you want to delet your data in the server? (y/n): ");
+        request = sc.nextLine();
+        if(request.equalsIgnoreCase("EXIT"))
+            return new Message(request);
+        if(request.equalsIgnoreCase("y")){
+            System.out.println("Enter location of the data you want to delete data: ");
+            String ans = in.readLine();
+            if(ans.equalsIgnoreCase("EXIT"))
+                return new Message(ans);
+            else {
+                int del  = Integer.parseInt(ans);
+                
+                return delete(del);
+            }
+        }
+        
         }
         catch(Exception e){
 	    // Uh oh...
@@ -203,5 +227,13 @@ public class EchoClient
         }
         return msg;
     }
+    
+    public static void printData(LinkedList<Integer> d){
+        
+    }
+//    public String toString(){
+//        
+//        
+//    }
 
 } //-- end class EchoClient

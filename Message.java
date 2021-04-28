@@ -1,4 +1,4 @@
-package server_sample;
+package server;
 /**
  * Marian Zaki (COSC 2354)
  * Very primitive-simple message class.  By implementing the Serializble
@@ -11,6 +11,8 @@ public class Message implements java.io.Serializable
 {
     /** The text string encoded in this Message object */
     public String theMessage;
+    private int val;
+    private int pos;
 
     /**
      * Constructor.
@@ -26,6 +28,8 @@ public class Message implements java.io.Serializable
 
             case "R": theMessage = "Rollback"; break;
             
+            case "V": theMessage = "Viewing data"; break;
+            
             default: 
                 theMessage = _msg;
 
@@ -34,20 +38,32 @@ public class Message implements java.io.Serializable
     }
     
     public Message(String met, int value){
+        this.val = value;
        
         switch(met)
         {
-            case "A": theMessage = "Update: add " + value; break;
+            case "A": theMessage = "Add " + value; break;
 
-            case "D": theMessage = "Update: delete " + value; break;
+            case "D": theMessage = "Delete " + value; break;
 
         }
   
     }
     
     public Message(int pos, int value){
+        this.pos = pos;
+        this.val = value;
         
-        theMessage = "Update: " + value + " at position " + pos;
+        theMessage = "Insert " + value + " at position " + pos;
     }
 
+    public int getVal() {
+        return val;
+    }
+
+    public int getPos() {
+        return pos;
+    }
+    
+    
 }  //-- End class Message
