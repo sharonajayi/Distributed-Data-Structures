@@ -1,4 +1,4 @@
-package server_sample;
+package server;
 
 import java.net.ServerSocket;  // The server uses this to bind to a port
 import java.net.Socket;        // Incoming connections are represented as sockets
