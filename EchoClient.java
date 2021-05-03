@@ -180,7 +180,7 @@ public class EchoClient
         Scanner sc = new Scanner(System.in);
         //******
             System.out.println("Enter the corresponding letter to carry out an action");
-        System.out.println("To ADD data - A, To DELETE - D, To VIEW - V");
+        System.out.println("To ADD data - A, To DELETE - D, To VIEW - V, To INSERT - I");
         String request = sc.nextLine();
         if(request.equalsIgnoreCase("EXIT"))
                 return new Message(request);
@@ -211,6 +211,21 @@ public class EchoClient
         else if(request.equalsIgnoreCase("V")){
             return view();
         
+        }
+        
+        else if(request.equalsIgnoreCase("I")){
+            System.out.println("Input your data");
+            String ans = in.readLine();
+            if(ans.equalsIgnoreCase("EXIT")){
+                return new Message(ans);
+            }
+            else {
+                System.out.println("Enter the location you want to place data");
+                String pos = in.readLine();
+                int ans2 = Integer.parseInt(ans);
+                int pos2 = Integer.parseInt(pos);
+                return insert(pos2,ans2);
+            }
         }
 
         }
