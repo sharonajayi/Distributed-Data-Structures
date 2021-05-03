@@ -55,25 +55,26 @@ public class EchoThread extends Thread
                 char command = msg.theMessage.charAt(0);
                 count++;
                 if(Character.compare(command, 'A') == 0){
+                    System.out.println("About to add");
                     add(msg.getVal());
-                    output.writeObject(msg.theMessage);
+                    output.writeObject(msg);
                     if(!EchoServer.status){
                         System.out.println("Not adding correctly");
                     }
                 }
                 else if(Character.compare(command, 'V') == 0){
                     System.out.println("Printing data");
-                    output.writeChars(view());
+                    output.writeObject(new Message(view()));
                     
                 }
                 else if(Character.compare(command, 'D') == 0){
                     System.out.println("Deleting");
                     delete(msg.getVal());
-                    output.writeObject(msg.theMessage);
+                    output.writeObject(msg);
                 }
                 
 		// Write an ACK back to the sender
-		
+		//output.writeObject(new Message("Recieved message #" + count));
 		               
 	    }while(!msg.theMessage.toUpperCase().equals("EXIT"));
 
@@ -108,7 +109,7 @@ public class EchoThread extends Thread
         StringBuilder str = new StringBuilder();
         for(int i = 0; i < EchoServer.data.size(); i++){
             if(i==0)
-                str.append("[").append(EchoServer.data.get(i)).append(" ");
+                str.append("[").append(EchoServer.data.get(i)).append(", ");
             else if(i == EchoServer.data.size() - 1)
                 str.append(EchoServer.data.get(i)).append("]");
             else
