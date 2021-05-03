@@ -1,4 +1,4 @@
-package server_sample;
+package server;
 
 /**
  * Marian Zaki (COSC 2354)
