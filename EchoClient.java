@@ -95,7 +95,7 @@ public class EchoClient
 	if(args.length != 2)
         {
             System.err.println("Not enough arguments.\n");
-            System.err.println("Usage:  java EchoClient <Server name or IP> <Server Port Number\n");
+            System.err.println("Usage:  java EchoClient <Server name or IP> <Server Port Number>\n");
             System.exit(-1);
         }
         
@@ -113,7 +113,7 @@ public class EchoClient
 	    final ObjectInputStream input = new ObjectInputStream(sock.getInputStream());
             
             
-            EchoClient c1 = new EchoClient(serverIP);
+            //EchoClient c1 = new EchoClient(serverIP);
 	    // loop to send messages
 	    Message msg = null, resp = null;
             Message resp2 = null;
@@ -125,7 +125,7 @@ public class EchoClient
 		// ObjectOutputStream "output" object automatically
 		// encodes the Message object into a format that can
 		// be transmitted over the socket to the server.
-		msg = readSomeText(c1,msg);
+		msg = readSomeText(msg);
 		output.writeObject(msg);   
                    
 		// Get ACK and print.  Since Message implements
@@ -173,7 +173,7 @@ public class EchoClient
 
     } //-- end readSomeText()
     
-    private static Message readSomeText(EchoClient c1, Message msg){
+    private static Message readSomeText(Message msg){
         try{
         System.out.println("Enter a line of text, or type \"EXIT\" to quit.");
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
