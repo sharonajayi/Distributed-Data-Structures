@@ -1,11 +1,12 @@
 package server;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.Thread;            // We will extend Java's base Thread class
 import java.net.Socket;
 import java.io.ObjectInputStream;   // For reading Java objects off of the wire
 import java.io.ObjectOutputStream;  // For writing Java objects to the wire
-
+import java.io.Serializable; // implement Serilazable
 import java.util.LinkedList;
 
 
@@ -16,7 +17,7 @@ import java.util.LinkedList;
  * over the socket until the socket is closed.
  *
  */
-public class EchoThread extends Thread
+public class EchoThread extends Thread implements Serializable
 {
     private final Socket socket;                   // The socket that we'll be talking over
     
@@ -105,6 +106,12 @@ public class EchoThread extends Thread
                             int j = EchoServer.data.get(i);
                             EchoServer.dataDisk.add(j);
                         }
+                        String fileName = "commit.ser";
+                        FileOutputStream file = new FileOutputStream(fileName);
+                        ObjectOutputStream out = new ObjectOutputStream(file);
+                        out.writeObject(EchoServer.dataDisk);
+                        out.close();
+                        file.close();
                         output.writeObject(msg);
                     }
                     else if(!commit()){
@@ -180,6 +187,8 @@ public class EchoThread extends Thread
                     output.writeObject(msg);
                     waiting = new Message("Finished",false);
                 }
+                
+                
                 else{
                     if(msg.theMessage.equalsIgnoreCase("EXIT"))
                         output.writeObject(new Message("Exiting Server",false));
@@ -281,17 +290,30 @@ public class EchoThread extends Thread
                     return true;
             }
         }
-//        else if (EchoServer.data.size()!= EchoServer.dataDisk.size())
-//            return true;
-//        else if(EchoServer.data.isEmpty())
-//            return false;
+        else if (EchoServer.data.size()!= EchoServer.dataDisk.size())
+            return true;
         
         return false;
     }
     
     private boolean rollback(){
+        if (EchoServer.dataDisk.isEmpty()){
+            return false;
+        }
+        
         return false;
         }
+    
+    private boolean commitCheck(){
+        if (EchoServer.dataDisk.isEmpty()){
+            return true;
+        }
+        return false;
+    }
+    
+    private boolean rollbackCheck(){
+        return false;
+    }
     private boolean updateConintueslly(int port, int value, int postion, char command){
      //   System.out.println("Staring continus update");
 //        if(EchoServer.allServers.size() == 1)
@@ -373,7 +395,7 @@ public class EchoThread extends Thread
         }
         
         
-        
+    }  
         
 
     
