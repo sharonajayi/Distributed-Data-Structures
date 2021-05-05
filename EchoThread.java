@@ -1,3 +1,4 @@
+
 package server;
 
 import java.io.EOFException;
@@ -111,6 +112,12 @@ public class EchoThread extends Thread
                             int j = EchoServer.data.get(i);
                             EchoServer.dataDisk.add(j);
                         }
+                        String fileName = "commit.ser";
+                        FileOutputStream file = new FileOutputStream(fileName);
+                        ObjectOutputStream out = new ObjectOutputStream(file);
+                        out.writeObject(EchoServer.dataDisk);
+                        out.close();
+                        file.close();
                         output.writeObject(msg);
                     }
                     else if(!commit()){
@@ -231,9 +238,24 @@ public class EchoThread extends Thread
         return false;
     }
     
-    private boolean rollback(){
+   private boolean rollback(){
+        if (EchoServer.dataDisk.isEmpty()){
+            return false;
+        }
+        
         return false;
         }
+    
+    private boolean commitCheck(){
+        if (EchoServer.dataDisk.isEmpty()){
+            return true;
+        }
+        return false;
+    }
+    
+    private boolean rollbackCheck(){
+        return false;
+    }
     private void updateConintueslly(int port, int value, int postion, char command){
         if(EchoServer.allServers.size() != 1){
             for (Integer ports : EchoServer.allServers) {
@@ -308,11 +330,7 @@ public class EchoThread extends Thread
             System.err.println("Error: " + e.getMessage());
 	    e.printStackTrace(System.err);
         }
-    }
-        
-        
-        
-
-    
+    }    
 
 } //-- end class EchoThread
+
