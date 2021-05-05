@@ -36,8 +36,8 @@ public class EchoClient
      * loads the last committed version (only occurs once)
      * it can only be called once by the client
      */
-    protected void rollback(){
-        
+    protected static Message rollback(){
+        return new Message ("V");
     }
     
     /** * view method.Retrieves the linked list data structure and prints 
@@ -48,12 +48,16 @@ public class EchoClient
         return new Message("V");
     }
     
-    /**commit method.
-     *loads the latest version to the disk
-     * @return true if user wants to save the new version
-     */
-    protected boolean commit(){
-        return true;
+//    /**commit method.
+//     *loads the latest version to the disk
+//     * @return true if user wants to save the new version
+//     */
+//    protected boolean commit(){
+//        return true;
+//    }
+    
+    protected static Message commit(){
+        return new Message("C");
     }
     
     /**
@@ -113,7 +117,7 @@ public class EchoClient
 	    final ObjectInputStream input = new ObjectInputStream(sock.getInputStream());
             
             
-            //EchoClient c1 = new EchoClient(serverIP);
+
 	    // loop to send messages
 	    Message msg = null, resp = null;
             Message resp2 = null;
@@ -125,7 +129,11 @@ public class EchoClient
 		// ObjectOutputStream "output" object automatically
 		// encodes the Message object into a format that can
 		// be transmitted over the socket to the server.
+
+		//msg = readSomeText(c1,msg);
+
 		msg = readSomeText(msg);
+
 		output.writeObject(msg);   
                    
 		// Get ACK and print.  Since Message implements
@@ -173,16 +181,24 @@ public class EchoClient
 
     } //-- end readSomeText()
     
+
+    //private static Message readSomeText(EchoClient c1, Message msg){
+
     private static Message readSomeText(Message msg){
+
         try{
         System.out.println("Enter a line of text, or type \"EXIT\" to quit.");
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         Scanner sc = new Scanner(System.in);
-        System.out.println("Do you want to add data to the server? (y/n): ");
+
+        //******
+            System.out.println("Enter the corresponding letter to carry out an action");
+        System.out.println("To ADD data - A, To DELETE - D, To VIEW - V, To INSERT - I, To COMMIT - C");
         String request = sc.nextLine();
         if(request.equalsIgnoreCase("EXIT"))
                 return new Message(request);
-        if(request.equalsIgnoreCase("y")){
+        else if(request.equalsIgnoreCase("A")){
+
             System.out.println("Input your data: ");
             String ans = in.readLine();
             if(ans.equalsIgnoreCase("EXIT"))
@@ -192,22 +208,12 @@ public class EchoClient
                 
                 return add(adding);
             }
+        }
+        
+        else if(request.equalsIgnoreCase("D")){
 
-        }
         
-        System.out.println("Do you want to view your data in the server? (y/n): ");
-        request = sc.nextLine();
-        if(request.equalsIgnoreCase("EXIT"))
-            return new Message(request);
-        if(request.equalsIgnoreCase("y")){
-            return view();
-        }
-        
-        System.out.println("Do you want to delet your data in the server? (y/n): ");
-        request = sc.nextLine();
-        if(request.equalsIgnoreCase("EXIT"))
-            return new Message(request);
-        if(request.equalsIgnoreCase("y")){
+
             System.out.println("Enter location of the data you want to delete data: ");
             String ans = in.readLine();
             if(ans.equalsIgnoreCase("EXIT"))
@@ -215,10 +221,39 @@ public class EchoClient
             else {
                 int del  = Integer.parseInt(ans);
                 
-                return delete(del);
+
+                return delete(del -1);
             }
         }
         
+        else if(request.equalsIgnoreCase("V")){
+            return view();
+        
+        }
+        
+        else if(request.equalsIgnoreCase("I")){
+            System.out.println("Input your data");
+            String ans = in.readLine();
+            if(ans.equalsIgnoreCase("EXIT")){
+                return new Message(ans);
+            }
+            else {
+                System.out.println("Enter the location you want to place data");
+                String pos = in.readLine();
+                int ans2 = Integer.parseInt(ans);
+                int pos2 = Integer.parseInt(pos);
+                return insert(pos2,ans2);
+            }
+        }
+        
+        else if(request.equalsIgnoreCase("C")){
+            return commit();
+        }
+        else if(request.equalsIgnoreCase("R")){
+            return rollback();
+        }
+
+
         }
         catch(Exception e){
 	    // Uh oh...

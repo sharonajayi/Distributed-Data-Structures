@@ -4,7 +4,7 @@ import java.net.ServerSocket;  // The server uses this to bind to a port
 import java.net.Socket;        // Incoming connections are represented as sockets
 import java.util.ArrayList;
 import java.util.Date;
-//import java.util.HashMap;
+
 import java.util.LinkedList;
 
 /**
@@ -19,9 +19,9 @@ public class EchoServer
     /** The server will listen on this port for client connections */
     //public static final int SERVER_PORT = 8754;
     
+
     protected static boolean status = false;
-    
-    //protected static HashMap<Integer, LinkedList<Integer>> updates = new HashMap<>();
+
     
     /*time stamp variable*/
     Date timeStamp;
@@ -42,7 +42,11 @@ public class EchoServer
     private static ArrayList<String[]> memoryLog;
     
     /*linked list of integers*/
+
     protected static LinkedList<Integer> data = new LinkedList<>();
+    
+    protected static LinkedList<Integer> dataDisk = new LinkedList<>();
+
 
     
     
@@ -69,13 +73,7 @@ public class EchoServer
         
     }
     
-    /**updateServer method.
-     * updates EchoClient command to  server and use replicate() to update the other servers
-     */
-//    public void updateServer(String cIP){
-//        replicate(cIP);
-//    }
-//    
+
     
     /**
      * Main routine.Just a dumb loop that keeps accepting new
@@ -121,11 +119,12 @@ public class EchoServer
 	    e.printStackTrace(System.err);
 	}
         
-       
+
        
 
     }  //-- end main(String[])
     
+
     //Makes sure that all the servers are updated
     protected static void intialUpdate(){
         if( AllServers.allServers.size() == 1)
@@ -144,3 +143,4 @@ public class EchoServer
     }
     
 } //-- End class EchoServer
+

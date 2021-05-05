@@ -5,7 +5,7 @@ import java.lang.Thread;            // We will extend Java's base Thread class
 import java.net.Socket;
 import java.io.ObjectInputStream;   // For reading Java objects off of the wire
 import java.io.ObjectOutputStream;  // For writing Java objects to the wire
-import java.net.ServerSocket;
+
 import java.util.LinkedList;
 
 
@@ -20,7 +20,9 @@ public class EchoThread extends Thread
 {
     private final Socket socket;                   // The socket that we'll be talking over
     
+
     private final int port;                     //The port that we are connecnted to
+
     /**
      * Constructor that sets up the socket we'll chat over
      *
@@ -59,6 +61,7 @@ public class EchoThread extends Thread
 		msg = (Message)input.readObject();
 		System.out.println("[" + socket.getInetAddress() + ":" + socket.getPort() + "] " + msg.theMessage);
                 char command = msg.theMessage.charAt(0);
+
                 
                 
                 if(Character.compare(command, 'A') == 0){
@@ -72,13 +75,47 @@ public class EchoThread extends Thread
                 else if(Character.compare(command, 'V') == 0){
                     System.out.println("Printing data");
                     output.writeObject(new Message(view(), false));
+
                     
                 }
                 else if(Character.compare(command, 'D') == 0){
                     System.out.println("Deleting");
+
                     delete(msg.getVal(), true);
                     output.writeObject(msg);
                 }
+                else if(Character.compare(command, 'I') ==0){
+                    System.out.println("Inserting");
+                    insert(msg.getPos(), msg.getVal());
+                    output.writeObject(msg);
+                }
+                else if(Character.compare(command, 'R') ==0){
+                    System.out.println("Calling Rollback");
+                    EchoServer.data.clear();
+                    for(int i=0; i<EchoServer.dataDisk.size(); i++){
+                        int j = EchoServer.dataDisk.get(i);
+                        EchoServer.data.add(j);
+                    }
+                }
+                else if(Character.compare(command, 'C') ==0){
+                    if(commit()){
+                        EchoServer.dataDisk.clear();
+                        System.out.println("Commiting To Disk");
+                        for(int i=0; i<EchoServer.data.size(); i++){
+                            int j = EchoServer.data.get(i);
+                            EchoServer.dataDisk.add(j);
+                        }
+                        output.writeObject(msg);
+                    }
+                    else if(!commit()){
+                        System.out.println("Cannot commit at this time");
+                        output.writeObject(msg);
+                    }
+                }
+                
+		// Write an ACK back to the sender
+		//output.writeObject(new Message("Recieved message #" + count));
+
                 else{
                     if(msg.theMessage.equalsIgnoreCase("EXIT"))
                         output.writeObject(new Message("Exiting Server", false));
@@ -88,6 +125,7 @@ public class EchoThread extends Thread
                 
 		// Write an ACK back to the sender
 		
+
 		               
 	    }while(!msg.theMessage.toUpperCase().equals("EXIT"));
 
@@ -103,6 +141,7 @@ public class EchoThread extends Thread
 
     }  //-- end run()
     
+
     public void run(Message msg, Socket sock){
         // Print incoming message
         Message waiting = null;
@@ -198,15 +237,18 @@ public class EchoThread extends Thread
         
         if(check)
             updateConintueslly(port, value, -1, 'D');
+
     }
     
     private String view(){
         StringBuilder str = new StringBuilder();
         for(int i = 0; i < EchoServer.data.size(); i++){
+
             if(EchoServer.data.size() == 1){
                 str.append("[").append(EchoServer.data.get(i)).append("]");
             }
             else if(i==0)
+
                 str.append("[").append(EchoServer.data.get(i)).append(", ");
             else if(i == EchoServer.data.size() - 1)
                 str.append(EchoServer.data.get(i)).append("]");
@@ -217,6 +259,39 @@ public class EchoThread extends Thread
         return str.toString();
     }
     
+
+    private void insert(int pos, int value){
+        EchoServer.data.add(pos, value);
+    }
+    
+    private boolean commit(){ //Needs a little bit of working
+        if(EchoServer.data.isEmpty() &&EchoServer.dataDisk.isEmpty() ){
+            return false;
+        }
+        else if(!EchoServer.data.isEmpty() && EchoServer.dataDisk.isEmpty()){
+            return true;
+        }
+        else if(EchoServer.data.isEmpty() && !EchoServer.dataDisk.isEmpty()){
+            return false;
+        }
+        else if(!EchoServer.data.isEmpty() && !EchoServer.dataDisk.isEmpty()
+                && EchoServer.data.size()== EchoServer.dataDisk.size()){
+            for(int i = 0; i < EchoServer.data.size(); i++){
+                if(EchoServer.data.get(i) != EchoServer.dataDisk.get(i))
+                    return true;
+            }
+        }
+//        else if (EchoServer.data.size()!= EchoServer.dataDisk.size())
+//            return true;
+//        else if(EchoServer.data.isEmpty())
+//            return false;
+        
+        return false;
+    }
+    
+    private boolean rollback(){
+        return false;
+        }
     private boolean updateConintueslly(int port, int value, int postion, char command){
      //   System.out.println("Staring continus update");
 //        if(EchoServer.allServers.size() == 1)
@@ -300,6 +375,7 @@ public class EchoThread extends Thread
         
         
         
-    }
+
+    
 
 } //-- end class EchoThread

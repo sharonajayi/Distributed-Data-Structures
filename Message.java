@@ -1,4 +1,5 @@
 package server;
+
 /**
  * Marian Zaki (COSC 2354)
  * Very primitive-simple message class.  By implementing the Serializble
