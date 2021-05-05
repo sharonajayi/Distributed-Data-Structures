@@ -77,6 +77,29 @@ public class EchoThread extends Thread
                     insert(msg.getPos(), msg.getVal());
                     output.writeObject(msg);
                 }
+                else if(Character.compare(command, 'R') ==0){
+                    System.out.println("Calling Rollback");
+                    EchoServer.data.clear();
+                    for(int i=0; i<EchoServer.dataDisk.size(); i++){
+                        int j = EchoServer.dataDisk.get(i);
+                        EchoServer.data.add(j);
+                    }
+                }
+                else if(Character.compare(command, 'C') ==0){
+                    if(commit()){
+                        EchoServer.dataDisk.clear();
+                        System.out.println("Commiting To Disk");
+                        for(int i=0; i<EchoServer.data.size(); i++){
+                            int j = EchoServer.data.get(i);
+                            EchoServer.dataDisk.add(j);
+                        }
+                        output.writeObject(msg);
+                    }
+                    else if(!commit()){
+                        System.out.println("Cannot commit at this time");
+                        output.writeObject(msg);
+                    }
+                }
                 
 		// Write an ACK back to the sender
 		//output.writeObject(new Message("Recieved message #" + count));
@@ -126,6 +149,35 @@ public class EchoThread extends Thread
     
     private void insert(int pos, int value){
         EchoServer.data.add(pos, value);
+    }
+    
+    private boolean commit(){ //Needs a little bit of working
+        if(EchoServer.data.isEmpty() &&EchoServer.dataDisk.isEmpty() ){
+            return false;
+        }
+        else if(!EchoServer.data.isEmpty() && EchoServer.dataDisk.isEmpty()){
+            return true;
+        }
+        else if(EchoServer.data.isEmpty() && !EchoServer.dataDisk.isEmpty()){
+            return false;
+        }
+        else if(!EchoServer.data.isEmpty() && !EchoServer.dataDisk.isEmpty()
+                && EchoServer.data.size()== EchoServer.dataDisk.size()){
+            for(int i = 0; i < EchoServer.data.size(); i++){
+                if(EchoServer.data.get(i) != EchoServer.dataDisk.get(i))
+                    return true;
+            }
+        }
+//        else if (EchoServer.data.size()!= EchoServer.dataDisk.size())
+//            return true;
+//        else if(EchoServer.data.isEmpty())
+//            return false;
+        
+        return false;
+    }
+    
+    private boolean rollback(){
+        return false;
     }
 
 } //-- end class EchoThread
