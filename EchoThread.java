@@ -39,6 +39,7 @@ public class EchoThread extends Thread
      * simply reads Message objects off of the socket.
      *
      */
+    @Override
     public void run()
     {
 	try{
@@ -63,14 +64,14 @@ public class EchoThread extends Thread
                 if(Character.compare(command, 'A') == 0){
                     System.out.println("About to add");
                     add(msg.getVal(), true);
-                    output.writeObject(msg);
-//                    if(!EchoServer.status){
-//                        System.out.println("Not adding correctly");
-//                    }
+                    if(msg.check)
+                        output.writeObject(msg);
+                    else
+                        output.writeObject(new Message("Finished", false));
                 }
                 else if(Character.compare(command, 'V') == 0){
                     System.out.println("Printing data");
-                    output.writeObject(new Message(view()));
+                    output.writeObject(new Message(view(), false));
                     
                 }
                 else if(Character.compare(command, 'D') == 0){
@@ -80,9 +81,9 @@ public class EchoThread extends Thread
                 }
                 else{
                     if(msg.theMessage.equalsIgnoreCase("EXIT"))
-                        output.writeObject(new Message("Exiting Server"));
+                        output.writeObject(new Message("Exiting Server", false));
                     else
-                        output.writeObject(new Message("Recieved message: "));
+                        output.writeObject(new Message("Recieved message: ", false));
                 }
                 
 		// Write an ACK back to the sender
@@ -104,6 +105,7 @@ public class EchoThread extends Thread
     
     public void run(Message msg, Socket sock){
         // Print incoming message
+        Message waiting = null;
         try{
 	    System.out.println("** New connection from " + sock.getInetAddress() + ":" 
                     + socket.getPort() + " **");
@@ -114,7 +116,6 @@ public class EchoThread extends Thread
 
 	    // Loop to read messages
 	    Message tempMsg = msg;
-	    int count = 0;
 	    do{
 		// read and print message
 		msg = (Message)input.readObject();
@@ -126,31 +127,31 @@ public class EchoThread extends Thread
                     System.out.println("About to add");
                     add(msg.getVal(), false);
                     output.writeObject(msg);
-//                    if(!EchoServer.status){
-//                        System.out.println("Not adding correctly");
-//                    }
+                    waiting = new Message("Finished", false);
                 }
-                else if(Character.compare(command, 'V') == 0){
-                    System.out.println("Printing data");
-                    output.writeObject(new Message(view()));
+                else if(Character.compare(command, 'C') == 0){
+                    System.out.println("Commiting data");
+                    output.writeObject(new Message(view(), false));
+                    waiting = new Message("Finished",false);
                     
                 }
                 else if(Character.compare(command, 'D') == 0){
                     System.out.println("Deleting");
                     delete(msg.getVal(), false);
                     output.writeObject(msg);
+                    waiting = new Message("Finished",false);
                 }
                 else{
                     if(msg.theMessage.equalsIgnoreCase("EXIT"))
-                        output.writeObject(new Message("Exiting Server"));
+                        output.writeObject(new Message("Exiting Server",false));
                     else
-                        output.writeObject(new Message("Recieved message: "));
+                        output.writeObject(new Message("Recieved message: ", false));
                 }
                 
 		// Write an ACK back to the sender
 		
 		               
-	    }while(!msg.theMessage.toUpperCase().equals("EXIT"));
+	    }while(!msg.theMessage.toUpperCase().equals("FINISHED"));
 
 	    // Close and cleanup
 	    System.out.println("** Closing connection with " + socket.getInetAddress() + ":" + socket.getPort() + " **");
@@ -162,15 +163,13 @@ public class EchoThread extends Thread
 	    e.printStackTrace(System.err);
 	}
     }
-	
-
-
-    
+	  
     
     
     private void add(int value, boolean check){
         
         EchoServer.data.add(value);
+        System.out.println(value + " was added");
         if(!EchoServer.data.contains(value)){
             System.out.println(value + " was not added in the data");
         }
@@ -179,8 +178,10 @@ public class EchoThread extends Thread
 //        if(AllServers.updates.containsKey(port))
 //            AllServers.updates.replace(port, EchoServer.data);
 //        else System.out.println("updates does not contain this port");
-       if(check) 
+       if(check){ 
+            //System.out.println("Update the other servers");
             updateConintueslly(port, value, -1, 'A');
+       }
     }
     
     private void delete(int value, boolean check){
@@ -217,44 +218,78 @@ public class EchoThread extends Thread
     }
     
     private boolean updateConintueslly(int port, int value, int postion, char command){
-        if(AllServers.allServers.size() == 1)
-            System.out.println("No updates needed");
-        else{
-            for (Integer ports : AllServers.allServers) {
+     //   System.out.println("Staring continus update");
+//        if(EchoServer.allServers.size() == 1)
+//            System.out.println("No updates needed");
+//        else{
+            for (Integer ports : EchoServer.allServers) {
                 if(ports == port) {
                 } 
                  else{
                     //Remove the data from updates and add the new value
                     if(command== 'A'){
-                        update(new Message("A", value), ports);
+                        update(new Message("A", value, true), ports);
                     }
                     else if(command == 'D'){
-                        update(new Message("D", value), ports);
+                        update(new Message("D", value, true), ports);
                     } 
-                    else if(command == 'I' && postion >= 0)
-                        update(new Message(postion, value), ports);
+                    else if(command == 'I' && postion != -1)
+                        update(new Message(postion, value,true), ports);
                     else
                         System.out.println("Command to update was invalid");
                     
                 }
             }
-        }
+        //}
         
         return true;
     }
     
     private void update(Message msg, int portTO){
-        Message response = null;
+        //System.out.println("Starting the update");
+        boolean status = false; Message tmpMsg = null;
         try{
-            final ServerSocket servSock = new ServerSocket(portTO);
-            final Socket sock = servSock.accept();
-	    System.out.println("Connected to " + servSock.getInetAddress().getHostAddress() + " on port " + portTO + 
-                    " LocalPort number is: " +sock.getLocalPort());
-	    
-	    // Set up I/O streams with the server
-	    final ObjectOutputStream output = new ObjectOutputStream(sock.getOutputStream());
-	    final ObjectInputStream input = new ObjectInputStream(sock.getInputStream());
+            final Socket sock = new Socket("localhost", portTO);
+            System.out.println("Connected to " + sock.getInetAddress() + " on port " + portTO + 
+                " LocalPort number is: " +sock.getLocalPort());
+            final ObjectInputStream input = new ObjectInputStream(sock.getInputStream());
+            final ObjectOutputStream output = new ObjectOutputStream(sock.getOutputStream());
+            System.out.println("About to go in to the do-while loop");
+            do {
+                System.out.println("***In the do-while loop**");
+                char command = msg.theMessage.charAt(0);
+                System.out.println("Command is: " + command);
+                if(Character.compare(command, 'A') == 0){
+                    System.out.println("About to add");
+                    output.writeObject(new Message(msg.theMessage, false));
+                    status = true;
+                }
+                else if(Character.compare(command, 'C') == 0){
+                    System.out.println("Commiting data");
+                    output.writeObject(new Message(msg.theMessage, false));
+                    status = true;
+                    
+                }
+                else if(Character.compare(command, 'D') == 0){
+                    System.out.println("Deleting");
+                    output.writeObject(new Message(msg.theMessage, false));
+                    //delete(msg.getVal(), false);
+                    status = true;
+                }
+                else{
+                    System.out.println("Message recieved is :" + msg.theMessage);
+                    output.writeObject(new Message("Nonsense", false));
+                    status = false;
+                }
+                
+                tmpMsg = (Message)input.readObject();
+            }
+            while(!tmpMsg.theMessage.toUpperCase().equals("FINISED"));
             
+            System.out.println("Close connections");
+            input.close();
+            output.close();
+            sock.close();
             
         }
         catch(Exception e){
@@ -262,7 +297,9 @@ public class EchoThread extends Thread
 	    e.printStackTrace(System.err);
         }
         
-        System.out.println("Close connection");
+        
+        
+        
     }
 
 } //-- end class EchoThread
