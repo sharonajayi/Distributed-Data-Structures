@@ -14,14 +14,16 @@ public class Message implements java.io.Serializable
     public String theMessage;
     private int val;
     private int pos;
+    public boolean check;
 
     /**
      * Constructor.
      *
      * @param _msg The string to be encoded in this Message object
+     * @param check
      *
      */
-    public Message(String _msg){
+    public Message(String _msg, boolean check){
 	switch(_msg)
         {
 
@@ -36,9 +38,11 @@ public class Message implements java.io.Serializable
 
         }
         
+        this.check = check;
+        
     }
     
-    public Message(String met, int value){
+    public Message(String met, int value, boolean check){
         this.val = value;
        
         switch(met)
@@ -48,14 +52,16 @@ public class Message implements java.io.Serializable
             case "D": theMessage = "Delete " + value; break;
 
         }
-  
+        
+        this.check = check;
     }
     
-    public Message(int pos, int value){
+    public Message(int pos, int value, boolean check){
         this.pos = pos;
         this.val = value;
         
         theMessage = "Insert " + value + " at position " + pos;
+        this.check = check;
     }
 
     public int getVal() {

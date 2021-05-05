@@ -34,7 +34,7 @@ public class EchoServer
         {
             add(7951);
             add(6536);
-            add(9113);
+            //add(9113);
         }
     };
     
@@ -126,21 +126,19 @@ public class EchoServer
     
 
     //Makes sure that all the servers are updated
-    protected static void intialUpdate(){
-        if( AllServers.allServers.size() == 1)
-            System.out.println("No updates needed");
-        else{
-            
-            LinkedList<Integer> original =  AllServers.updates.get( AllServers.allServers.get(0));
-            for(int i: original){
-                data.add(i);
-            }
-            
-            System.out.println("Inital Updates completed");
-        }
-        
-        
-    }
+//    protected static void intialUpdate(){
+//        if(allServers.size() == 1)
+//            System.out.println("No updates needed");
+//        else{
+//            
+//            for(int i: original){
+//                data.add(i);
+//            }
+//            
+//            System.out.println("Inital Updates completed");
+//        }
+//        
+//        
+//    }
     
 } //-- End class EchoServer
-
