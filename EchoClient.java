@@ -36,8 +36,8 @@ public class EchoClient
      * loads the last committed version (only occurs once)
      * it can only be called once by the client
      */
-    protected void rollback(){
-        
+    protected static Message rollback(){
+        return new Message ("V");
     }
     
     /** * view method.Retrieves the linked list data structure and prints 
@@ -48,12 +48,16 @@ public class EchoClient
         return new Message("V");
     }
     
-    /**commit method.
-     *loads the latest version to the disk
-     * @return true if user wants to save the new version
-     */
-    protected boolean commit(){
-        return true;
+//    /**commit method.
+//     *loads the latest version to the disk
+//     * @return true if user wants to save the new version
+//     */
+//    protected boolean commit(){
+//        return true;
+//    }
+    
+    protected static Message commit(){
+        return new Message("C");
     }
     
     /**
@@ -180,7 +184,7 @@ public class EchoClient
         Scanner sc = new Scanner(System.in);
         //******
             System.out.println("Enter the corresponding letter to carry out an action");
-        System.out.println("To ADD data - A, To DELETE - D, To VIEW - V, To INSERT - I");
+        System.out.println("To ADD data - A, To DELETE - D, To VIEW - V, To INSERT - I, To COMMIT - C");
         String request = sc.nextLine();
         if(request.equalsIgnoreCase("EXIT"))
                 return new Message(request);
@@ -226,6 +230,13 @@ public class EchoClient
                 int pos2 = Integer.parseInt(pos);
                 return insert(pos2,ans2);
             }
+        }
+        
+        else if(request.equalsIgnoreCase("C")){
+            return commit();
+        }
+        else if(request.equalsIgnoreCase("R")){
+            return rollback();
         }
 
         }
