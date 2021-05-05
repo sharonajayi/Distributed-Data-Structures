@@ -37,7 +37,7 @@ public class EchoClient
      * it can only be called once by the client
      */
     protected static Message rollback(){
-        return new Message ("V");
+        return new Message ("V", true);
     }
     
     /** * view method.Retrieves the linked list data structure and prints 
@@ -45,7 +45,7 @@ public class EchoClient
      * @return 
      */
     protected static Message view(){
-        return new Message("V");
+        return new Message("V", true);
     }
     
 //    /**commit method.
@@ -57,7 +57,7 @@ public class EchoClient
 //    }
     
     protected static Message commit(){
-        return new Message("C");
+        return new Message("C",true);
     }
     
     /**
@@ -67,7 +67,7 @@ public class EchoClient
      * @return 
      */
     protected static Message insert(int pos, int value){
-         return new Message(pos, value);
+         return new Message(pos, value,true);
     }
     
     /** * delete method.removes a specified integer
@@ -75,7 +75,7 @@ public class EchoClient
      * @return 
      */
     protected static Message delete(int value){
-         return new Message("D", value);
+         return new Message("D", value, true);
     }
     
     /**
@@ -85,7 +85,7 @@ public class EchoClient
      * @return 
      */
     protected static Message add(int value){ 
-        return new Message("A", value);
+        return new Message("A", value, true);
     }
     
     
@@ -196,13 +196,13 @@ public class EchoClient
         System.out.println("To ADD data - A, To DELETE - D, To VIEW - V, To INSERT - I, To COMMIT - C");
         String request = sc.nextLine();
         if(request.equalsIgnoreCase("EXIT"))
-                return new Message(request);
+                return new Message(request,false);
         else if(request.equalsIgnoreCase("A")){
 
             System.out.println("Input your data: ");
             String ans = in.readLine();
             if(ans.equalsIgnoreCase("EXIT"))
-                return new Message(ans);
+                return new Message(ans,true);
             else {
                 int adding  = Integer.parseInt(ans);
                 
@@ -217,7 +217,7 @@ public class EchoClient
             System.out.println("Enter location of the data you want to delete data: ");
             String ans = in.readLine();
             if(ans.equalsIgnoreCase("EXIT"))
-                return new Message(ans);
+                return new Message(ans, true);
             else {
                 int del  = Integer.parseInt(ans);
                 
@@ -235,7 +235,7 @@ public class EchoClient
             System.out.println("Input your data");
             String ans = in.readLine();
             if(ans.equalsIgnoreCase("EXIT")){
-                return new Message(ans);
+                return new Message(ans, true);
             }
             else {
                 System.out.println("Enter the location you want to place data");
@@ -257,7 +257,7 @@ public class EchoClient
         }
         catch(Exception e){
 	    // Uh oh...
-            msg = new Message ("");
+            msg = new Message ("", false);
 	    return msg;
         }
         return msg;
