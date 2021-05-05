@@ -70,7 +70,7 @@ public class EchoThread extends Thread
                     if(msg.check)
                         output.writeObject(msg);
                     else
-                        output.writeObject(new Message("Finished", false));
+                        msg.theMessage = "EXIT"; msg.check = false;
                 }
                 else if(Character.compare(command, 'V') == 0){
                     System.out.println("Printing data");
@@ -143,7 +143,7 @@ public class EchoThread extends Thread
 
 	}
         catch(EOFException ef){
-            System.out.println("Connection was closed"); 
+            System.out.println("** Connection was closed **"); 
         }
 	catch(Exception e){
 	    System.err.println("Error: " + e.getMessage());
@@ -234,11 +234,8 @@ public class EchoThread extends Thread
     private boolean rollback(){
         return false;
         }
-    private boolean updateConintueslly(int port, int value, int postion, char command){
-     //   System.out.println("Staring continus update");
-//        if(EchoServer.allServers.size() == 1)
-//            System.out.println("No updates needed");
-//        else{
+    private void updateConintueslly(int port, int value, int postion, char command){
+        if(EchoServer.allServers.size() != 1){
             for (Integer ports : EchoServer.allServers) {
                 if(ports != port) {
                     //Remove the data from updates and add the new value
@@ -254,13 +251,9 @@ public class EchoThread extends Thread
                         System.out.println("Command to update was invalid");
                     
                 }
-                else{
-                    System.out.println("Trying to connect to port: " + ports);
-                }
             }
-        //}
+        }
         
-        return true;
     }
     
     private void update(Message msg, int portTO){
@@ -271,55 +264,45 @@ public class EchoThread extends Thread
             System.out.println("Connected to " + serverSock.getInetAddress() + " on port " + portTO + 
                 " LocalPort number is: " +serverSock.getLocalPort());
             final ObjectOutputStream out = new ObjectOutputStream(serverSock.getOutputStream());
-            //System.out.println("input stream is now open");   
             final ObjectInputStream in = new ObjectInputStream(serverSock.getInputStream());
-            //System.out.println("About to go in to the do-while loop");
-            do {
-                System.out.println("***In the do-while loop**");
-                char command = msg.theMessage.charAt(0);
-                System.out.println("Command is: " + command);
-                if(Character.compare(command, 'A') == 0 && msg.check){
-                    System.out.println("Adding");
-                    System.out.println("Message sending: " + msg.theMessage);
-                    msg.check = false;
-                    out.writeObject(msg);
-                    status = true;
-                    System.out.println("status = " + status);
-                }
-                else if(Character.compare(command, 'I') == 0 && msg.check){
-                    System.out.println("Commiting data");
-                    msg.check = false;
-                    out.writeObject(msg);
-                    status = true;
-                    
-                }
-                else if(Character.compare(command, 'D') == 0 && msg.check){
-                    System.out.println("Deleting");
-                    msg.check = false;
-                    out.writeObject(msg);
-                    status = true;
-                }
-                else{
-                    System.out.println("Message recieved is :" + msg.theMessage);
-                    out.writeObject(new Message("Nonsense", false));
-                    status = false;
-                    System.out.println("status = " + status);
-                }
-                
-                tmpMsg = (Message)in.readObject();
-                System.out.println("Input message: " + tmpMsg.theMessage + " and status:" + tmpMsg.check);
+ 
+            char command = msg.theMessage.charAt(0);
+            System.out.println("Command is: " + command);
+            if(Character.compare(command, 'A') == 0 && msg.check){
+                System.out.println("Adding");
+                System.out.println("Message sending: " + msg.theMessage);
+                msg.check = false;
+                out.writeObject(msg);
+                status = true;
+                System.out.println("status = " + status);
             }
-            while(!tmpMsg.theMessage.toUpperCase().equals("FINISHED"));
-            out.writeObject(new Message("EXIT", false));
-            System.out.println("Close connections");
+            else if(Character.compare(command, 'I') == 0 && msg.check){
+                System.out.println("Commiting data");
+                msg.check = false;
+                out.writeObject(msg);
+                status = true;
+
+            }
+            else if(Character.compare(command, 'D') == 0 && msg.check){
+                System.out.println("Deleting");
+                msg.check = false;
+                out.writeObject(msg);
+                status = true;
+            }
+            else{
+                System.out.println("Message recieved is :" + msg.theMessage);
+                out.writeObject(new Message("Nonsense", false));
+                status = false;
+                System.out.println("status = " + status);
+            }
+           System.out.println("** Closing connection with " + serverSock.getInetAddress() + ":" + serverSock.getPort() + " **");
             in.close();
             out.close();
-            System.out.println("** Closing connection with " + serverSock.getInetAddress() + ":" + serverSock.getPort() + " **");
-            serverSock.close();
+             serverSock.close();
             
         }
         catch(EOFException ef){
-            System.out.println("Connection was closed"); 
+            System.out.println("*Connection was closed*"); 
         }
         catch(Exception e){
             System.err.println("Error: " + e.getMessage());
