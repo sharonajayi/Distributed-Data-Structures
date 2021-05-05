@@ -99,7 +99,7 @@ public class EchoClient
 	if(args.length != 2)
         {
             System.err.println("Not enough arguments.\n");
-            System.err.println("Usage:  java EchoClient <Server name or IP> <Server Port Number\n");
+            System.err.println("Usage:  java EchoClient <Server name or IP> <Server Port Number>\n");
             System.exit(-1);
         }
         
@@ -117,7 +117,7 @@ public class EchoClient
 	    final ObjectInputStream input = new ObjectInputStream(sock.getInputStream());
             
             
-            EchoClient c1 = new EchoClient(serverIP);
+
 	    // loop to send messages
 	    Message msg = null, resp = null;
             Message resp2 = null;
@@ -129,7 +129,11 @@ public class EchoClient
 		// ObjectOutputStream "output" object automatically
 		// encodes the Message object into a format that can
 		// be transmitted over the socket to the server.
-		msg = readSomeText(c1,msg);
+
+		//msg = readSomeText(c1,msg);
+
+		msg = readSomeText(msg);
+
 		output.writeObject(msg);   
                    
 		// Get ACK and print.  Since Message implements
@@ -177,11 +181,16 @@ public class EchoClient
 
     } //-- end readSomeText()
     
-    private static Message readSomeText(EchoClient c1, Message msg){
+
+    //private static Message readSomeText(EchoClient c1, Message msg){
+
+    private static Message readSomeText(Message msg){
+
         try{
         System.out.println("Enter a line of text, or type \"EXIT\" to quit.");
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         Scanner sc = new Scanner(System.in);
+
         //******
             System.out.println("Enter the corresponding letter to carry out an action");
         System.out.println("To ADD data - A, To DELETE - D, To VIEW - V, To INSERT - I, To COMMIT - C");
@@ -189,6 +198,7 @@ public class EchoClient
         if(request.equalsIgnoreCase("EXIT"))
                 return new Message(request);
         else if(request.equalsIgnoreCase("A")){
+
             System.out.println("Input your data: ");
             String ans = in.readLine();
             if(ans.equalsIgnoreCase("EXIT"))
@@ -201,6 +211,9 @@ public class EchoClient
         }
         
         else if(request.equalsIgnoreCase("D")){
+
+        
+
             System.out.println("Enter location of the data you want to delete data: ");
             String ans = in.readLine();
             if(ans.equalsIgnoreCase("EXIT"))
@@ -208,6 +221,7 @@ public class EchoClient
             else {
                 int del  = Integer.parseInt(ans);
                 
+
                 return delete(del -1);
             }
         }
@@ -238,6 +252,7 @@ public class EchoClient
         else if(request.equalsIgnoreCase("R")){
             return rollback();
         }
+
 
         }
         catch(Exception e){

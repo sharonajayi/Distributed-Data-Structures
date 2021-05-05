@@ -4,6 +4,7 @@ import java.net.ServerSocket;  // The server uses this to bind to a port
 import java.net.Socket;        // Incoming connections are represented as sockets
 import java.util.ArrayList;
 import java.util.Date;
+
 import java.util.LinkedList;
 
 /**
@@ -16,9 +17,11 @@ import java.util.LinkedList;
 public class EchoServer
 {
     /** The server will listen on this port for client connections */
-    public static final int SERVER_PORT = 8754;
+    //public static final int SERVER_PORT = 8754;
     
-    public static boolean status = false;
+
+    protected static boolean status = false;
+
     
     /*time stamp variable*/
     Date timeStamp;
@@ -27,15 +30,23 @@ public class EchoServer
     protected boolean[] available; //might not need this
     
     /*array list that contains all the servers*/
-    private ArrayList<EchoServer> allServers;
+    protected static ArrayList<Integer> allServers = new ArrayList<Integer>(){
+        {
+            add(7951);
+            add(6536);
+            add(9113);
+        }
+    };
     
     /*array list that contains memory logs*/
-    private ArrayList<String[]> memoryLog;
+    private static ArrayList<String[]> memoryLog;
     
     /*linked list of integers*/
-    public static LinkedList<Integer> data = new LinkedList<>();
+
+    protected static LinkedList<Integer> data = new LinkedList<>();
     
-    public static LinkedList<Integer> dataDisk = new LinkedList<>();
+    protected static LinkedList<Integer> dataDisk = new LinkedList<>();
+
 
     
     
@@ -62,13 +73,7 @@ public class EchoServer
         
     }
     
-    /**updateServer method.
-     * updates EchoClient command to  server and use replicate() to update the other servers
-     */
-    public void updateServer(String cIP){
-        replicate(cIP);
-    }
-    
+
     
     /**
      * Main routine.Just a dumb loop that keeps accepting new
@@ -80,7 +85,21 @@ public class EchoServer
     {
 	try{
 	    // This is basically just listens for new client connections
-	    final ServerSocket serverSock = new ServerSocket(SERVER_PORT);
+            if(args.length != 1)
+            {
+                System.err.println("Not enough arguments.\n");
+                System.err.println("Usage:  java EchoServer <Server Port Number>\n");
+                System.out.println("Port number sould be 7951, 6536, or 9113");
+                System.exit(-1);
+            }
+            int serverPort = Integer.parseInt(args[0]);
+	    
+            if(!allServers.contains(serverPort)){
+                System.out.println("Invaild port, use one of the following 7951, 6536, or 9113");
+                System.exit(-1);
+            }
+                
+            final ServerSocket serverSock = new ServerSocket(serverPort);
 	    System.out.println("Server started successfully .... ");
 	    // A simple infinite loop to accept connections
 	    Socket sock = null;
@@ -89,7 +108,7 @@ public class EchoServer
 	    while(true){
                 System.out.println("Waiting for a new connection .... ");
 		sock = serverSock.accept();     // Accept an incoming connection (blocking method)
-		thread = new EchoThread(sock);  // Create a thread to handle this connection
+		thread = new EchoThread(sock, serverPort);  // Create a thread to handle this connection
 		thread.start();                 // Fork the thread
 	    }                                   // Loop to work on new connections while this
                                                 // the accept()ed connection is handled
@@ -100,9 +119,28 @@ public class EchoServer
 	    e.printStackTrace(System.err);
 	}
         
-        //C:\Users\isabe\OneDrive\Desktop\Server\EchoServer.java
+
        
 
     }  //-- end main(String[])
     
+
+    //Makes sure that all the servers are updated
+    protected static void intialUpdate(){
+        if( AllServers.allServers.size() == 1)
+            System.out.println("No updates needed");
+        else{
+            
+            LinkedList<Integer> original =  AllServers.updates.get( AllServers.allServers.get(0));
+            for(int i: original){
+                data.add(i);
+            }
+            
+            System.out.println("Inital Updates completed");
+        }
+        
+        
+    }
+    
 } //-- End class EchoServer
+
