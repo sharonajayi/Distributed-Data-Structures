@@ -5,6 +5,14 @@ import java.lang.Thread;            // We will extend Java's base Thread class
 import java.net.Socket;
 import java.io.ObjectInputStream;   // For reading Java objects off of the wire
 import java.io.ObjectOutputStream;  // For writing Java objects to the wire
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 
 
@@ -20,6 +28,9 @@ public class EchoThread extends Thread
     
 
     private final int port;                     //The port that we are connecnted to
+    
+      
+    Date time;/*time stamp variable*/
 
     /**
      * Constructor that sets up the socket we'll chat over
@@ -67,6 +78,7 @@ public class EchoThread extends Thread
                 if(Character.compare(command, 'A') == 0){ //executes add
                     //System.out.println("About to add");
                     add(msg.getVal(), msg.check);
+                    createTimeStamp(msg.theMessage); //create a timestamp for memory log
                     if(msg.check)
                         output.writeObject(msg);
                     else
@@ -75,12 +87,14 @@ public class EchoThread extends Thread
                 else if(Character.compare(command, 'V') == 0){
                     //System.out.println("Printing data");
                     output.writeObject(new Message(view(), false));
+                    createTimeStamp(msg.theMessage); //create a timestamp for memory log
 
                     
                 }
                 else if(Character.compare(command, 'D') == 0){
                     //System.out.println("Deleting");
                     delete(msg.getVal(), msg.check);
+                    createTimeStamp(msg.theMessage); //create a timestamp for memory log
                     if(msg.check)
                         output.writeObject(msg);
                     else
@@ -89,6 +103,7 @@ public class EchoThread extends Thread
                 else if(Character.compare(command, 'I') ==0){
                     //System.out.println("Inserting");
                     insert(msg.getPos(), msg.getVal(), msg.check);
+                    createTimeStamp(msg.theMessage); //create a timestamp for memory log
                     if(msg.check)
                         output.writeObject(msg);
                     else
@@ -101,6 +116,8 @@ public class EchoThread extends Thread
                         int j = EchoServer.dataDisk.get(i);
                         EchoServer.data.add(j);
                     }
+                    
+                    createTimeStamp(msg.theMessage); //create a timestamp for memory log
                 }
                 else if(Character.compare(command, 'C') ==0){
                     if(commit()){
@@ -111,6 +128,7 @@ public class EchoThread extends Thread
                             EchoServer.dataDisk.add(j);
                         }
                         
+                        createTimeStamp(msg.theMessage); //create a timestamp for memory log
                         if(msg.check)
                             output.writeObject(msg);
                         else
@@ -124,13 +142,18 @@ public class EchoThread extends Thread
                             msg.theMessage = "EXIT"; msg.check = false;
                     }
                 }
+                else if(Character.compare(command, 'M') == 0){
+                    output.writeObject(new Message(printMemoryLog(), false));
+                }
                 
 		// Write an ACK back to the sender
 		//output.writeObject(new Message("Recieved message #" + count));
 
                 else{
-                    if(msg.theMessage.equalsIgnoreCase("EXIT"))
+                    if(msg.theMessage.equalsIgnoreCase("EXIT")){
                         output.writeObject(new Message("Exiting Server", false));
+                        createTimeStamp(msg.theMessage); //create a timestamp for memory log
+                    }
                     else
                         output.writeObject(new Message("Recieved message: ", false));
                 }
@@ -167,7 +190,7 @@ public class EchoThread extends Thread
     private void add(int value, boolean check){
         
         EchoServer.data.add(value);
-        System.out.println(value + " was added");
+        //System.out.println(value + " was added");
         if(!EchoServer.data.contains(value)){
             System.out.println(value + " was not added in the data");
         }
@@ -270,6 +293,38 @@ public class EchoThread extends Thread
     } //--rollack()
     
     /**
+     * Creates a timeStamp and puts in the memory log to keep track of'
+     * commands sent to the servers by client or other server
+     * @param msg 
+     */
+    private void createTimeStamp(String msg) {
+        DateFormat form = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
+        HashMap<String, String> timeStamp = new HashMap<>();
+        time = new Date();
+        timeStamp.put(form.format(time), msg);
+        EchoServer.memoryLog.add(timeStamp);
+        
+    } //--createTimeStamp()
+    
+    private String printMemoryLog(){
+        StringBuilder str = new StringBuilder();
+        int i = 0;
+        for(HashMap<String,String> stamp : EchoServer.memoryLog){
+            for(String key : stamp.keySet()){
+            if(i == 0)
+                str.append("{<").append(key).append(",").append(stamp.get(key)).append(">");
+            if(EchoServer.memoryLog.size() == i)
+                str.append("}");
+            else if(i != 0)
+                str.append(" : <").append(key).append(",").append(stamp.get(key)).append(">");
+            }
+            i++;
+        }
+        
+        return str.toString();
+    } //--printMemoryLog()
+    
+    /**
      * 
      * @param port that the socket connects to
      * @param value being added by the server
@@ -320,14 +375,15 @@ public class EchoThread extends Thread
             final ObjectOutputStream out = new ObjectOutputStream(serverSock.getOutputStream());
             final ObjectInputStream in = new ObjectInputStream(serverSock.getInputStream());
             
+            
             //Get the command server needs to execute
             char command = msg.theMessage.charAt(0);
             //System.out.println("Command is: " + command);
             
             //Sends an add message to the server connected to 
             if(Character.compare(command, 'A') == 0 && msg.check){
-                System.out.println("Adding");
-                System.out.println("Message sending: " + msg.theMessage);
+                //System.out.println("Adding");
+                //System.out.println("Message sending: " + msg.theMessage);
                 msg.check = false; //identify that a server sent this message
                 out.writeObject(msg);
             }
@@ -340,13 +396,13 @@ public class EchoThread extends Thread
             }
             //sends a delete command to the server connected to
             else if(Character.compare(command, 'D') == 0 && msg.check){
-                System.out.println("Deleting");
+                //System.out.println("Deleting");
                 msg.check = false;//identify that a server sent this message
                 out.writeObject(msg);
             }
             //sends a command command to the server connected to
             else if(Character.compare(command, 'C') == 0 && msg.check){
-                System.out.println("Committing");
+                //System.out.println("Committing");
                 msg.check = false;//identify that a server sent this message
                 out.writeObject(msg);
             }
@@ -377,6 +433,8 @@ public class EchoThread extends Thread
 	    e.printStackTrace(System.err);
         }
     } //--update()
+
+
         
         
         

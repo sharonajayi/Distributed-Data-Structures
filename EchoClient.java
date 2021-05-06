@@ -32,9 +32,12 @@ public class EchoClient
      * @return sends message to print out the data in server
      */
     protected static Message view(){
-        return new Message("V", true);
+        return new Message("V", false);
     }
     
+    protected static Message history(){
+        return new Message("M", false);
+    }
 
     /**
      * Sends a message to commit data in server to disk
@@ -179,7 +182,7 @@ public class EchoClient
 
         //******
             System.out.println("Enter the corresponding letter to carry out an action");
-        System.out.println("To ADD data - A, To DELETE - D, To VIEW - V, To INSERT - I, To COMMIT - C");
+        System.out.println("To ADD data - A, To DELETE - D, To VIEW - V, To INSERT - I, To COMMIT - C, To Rollback - R, To View History - H");
         String request = sc.nextLine();
         if(request.equalsIgnoreCase("EXIT"))
                 return new Message(request,false);
@@ -215,6 +218,9 @@ public class EchoClient
         else if(request.equalsIgnoreCase("V")){
             return view();
         
+        }
+        else if(request.equalsIgnoreCase("H")){
+            return history();
         }
         
         else if(request.equalsIgnoreCase("I")){

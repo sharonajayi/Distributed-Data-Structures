@@ -33,6 +33,8 @@ public class Message implements java.io.Serializable
             
             case "V": theMessage = "Viewing data"; break;
             
+            case "M": theMessage = "Memory Log being displayed"; break;
+            
             default: 
                 theMessage = _msg;
 
