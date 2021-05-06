@@ -2,7 +2,7 @@
 package server;
 
 import java.io.EOFException;
-=======
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -10,6 +10,7 @@ import java.lang.Thread;            // We will extend Java's base Thread class
 import java.net.Socket;
 import java.io.ObjectInputStream;   // For reading Java objects off of the wire
 import java.io.ObjectOutputStream;  // For writing Java objects to the wire
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ import java.util.LinkedList;
  * (Echo Client) sends to the server (EchoSever)
  *
  */
-public class EchoThread extends Thread
+public class EchoThread extends Thread implements Serializable
 {
     private final Socket socket;                   // The socket that we'll be talking over
     
@@ -315,13 +316,13 @@ public class EchoThread extends Thread
         return false;
     } //--commit()
     
-    /**
-     * Determines if server can rollback pervious version committed to disk 
-     * @return 
-     */
-    private boolean rollback(){
-        return false;
-    } //--rollack()
+//    /**
+//     * Determines if server can rollback pervious version committed to disk 
+//     * @return 
+//     */
+//    private boolean rollback(){
+//        return false;
+//    } //--rollack()
     
     /**
      * Creates a timeStamp and puts in the memory log to keep track of'
@@ -365,38 +366,38 @@ public class EchoThread extends Thread
      */
 
 
-    private void insert(int pos, int value, boolean check){
-        EchoServer.data.add(pos, value);
-        
-        if(check){ 
-            //System.out.println("Update the other servers");
-            updateConintueslly(port, value, -1, 'A');
-       }
-    }
+//    private void insert(int pos, int value, boolean check){
+//        EchoServer.data.add(pos, value);
+//        
+//        if(check){ 
+//            //System.out.println("Update the other servers");
+//            updateConintueslly(port, value, -1, 'A');
+//       }
+//    }
     
-    private boolean commit(){ //Needs a little bit of working
-        if(EchoServer.data.isEmpty() &&EchoServer.dataDisk.isEmpty() ){
-            return false;
-        }
-        else if(!EchoServer.data.isEmpty() && EchoServer.dataDisk.isEmpty()){
-            return true;
-        }
-        else if(EchoServer.data.isEmpty() && !EchoServer.dataDisk.isEmpty()){
-            return false;
-        }
-        else if(!EchoServer.data.isEmpty() && !EchoServer.dataDisk.isEmpty()
-                && EchoServer.data.size() == EchoServer.dataDisk.size()){
-            for(int i = 0; i < EchoServer.data.size(); i++){
-                if(EchoServer.data.get(i) != EchoServer.dataDisk.get(i))
-                    return true;
-               
-            }
-        }
-        else if (EchoServer.data.size()!= EchoServer.dataDisk.size())
-            return true;
-        
-        return false;
-    }
+//    private boolean commit(){ //Needs a little bit of working
+//        if(EchoServer.data.isEmpty() &&EchoServer.dataDisk.isEmpty() ){
+//            return false;
+//        }
+//        else if(!EchoServer.data.isEmpty() && EchoServer.dataDisk.isEmpty()){
+//            return true;
+//        }
+//        else if(EchoServer.data.isEmpty() && !EchoServer.dataDisk.isEmpty()){
+//            return false;
+//        }
+//        else if(!EchoServer.data.isEmpty() && !EchoServer.dataDisk.isEmpty()
+//                && EchoServer.data.size() == EchoServer.dataDisk.size()){
+//            for(int i = 0; i < EchoServer.data.size(); i++){
+//                if(EchoServer.data.get(i) != EchoServer.dataDisk.get(i))
+//                    return true;
+//               
+//            }
+//        }
+//        else if (EchoServer.data.size()!= EchoServer.dataDisk.size())
+//            return true;
+//        
+//        return false;
+//    }
     
    private boolean rollback(){
         if (commitCheck && rollbackCheck){
