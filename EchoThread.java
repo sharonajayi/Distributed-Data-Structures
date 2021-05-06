@@ -13,12 +13,9 @@ import java.io.ObjectOutputStream;  // For writing Java objects to the wire
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+
 
 import java.util.LinkedList;
 
@@ -128,27 +125,13 @@ public class EchoThread extends Thread implements Serializable
                  
                 else if(Character.compare(command, 'R') ==0){
                     if(rollback()){
-                        System.out.println("Calling Rollback");
-                        EchoServer.data.clear();
-                        for(int i=0; i<EchoServer.dataDisk.size(); i++){
-                            int j = EchoServer.dataDisk.get(i);
-                            EchoServer.data.add(j);
-                        }
-                        FileInputStream file = new FileInputStream(fileName);
-                        ObjectInputStream in = new ObjectInputStream(file);
-                        Disk = (LinkedList<Integer>)in.readObject();
-                        //System.out.println("DESERIALIZED" + Disk);
-                        EchoServer.data.clear();
-                        for(int i=0; i<Disk.size(); i++){
-                            int j = Disk.get(i);
-                            EchoServer.data.add(j);
-                        }
-                        in.close();
-                        file.close();
-                        rollbackCheck = true; //rollback has been called
+                        callRollback(msg.check);
                         createTimeStamp(msg.theMessage); //create a timestamp for memory log
-                        output.writeObject(msg);
-                    }
+                        if(msg.check)
+                            output.writeObject(msg);
+                        else
+                            msg.theMessage = "EXIT"; msg.check = false;
+                        }
                     else if(!rollback()){
                         //System.out.println("Rollback can occur only one time/ User has not commited any data");
                         output.writeObject(new Message("Rollback can occur only one time OR User has not commited any data"));
@@ -156,19 +139,7 @@ public class EchoThread extends Thread implements Serializable
                 }
                 else if(Character.compare(command, 'C') ==0){
                     if(commit()){
-                        EchoServer.dataDisk.clear();
-                        System.out.println("Commiting To Disk");
-                        for(int i=0; i<EchoServer.data.size(); i++){
-                            int j = EchoServer.data.get(i);
-                            EchoServer.dataDisk.add(j);
-                        }
-                        //Serializing data content
-                        FileOutputStream file = new FileOutputStream(fileName);
-                        ObjectOutputStream out = new ObjectOutputStream(file);
-                        out.writeObject(EchoServer.dataDisk);
-                        out.close();
-                        file.close();
-                        commitCheck = true;
+                        callCommit(msg.check);
                         createTimeStamp(msg.theMessage); //create a timestamp for memory log
                         output.writeObject(msg);
                     }
@@ -316,13 +287,72 @@ public class EchoThread extends Thread implements Serializable
         return false;
     } //--commit()
     
-//    /**
-//     * Determines if server can rollback pervious version committed to disk 
-//     * @return 
-//     */
-//    private boolean rollback(){
-//        return false;
-//    } //--rollack()
+    
+    /**
+     * 
+     * @param check 
+     */
+    private void callCommit(boolean check){
+        EchoServer.dataDisk.clear();
+        try{
+            System.out.println("Commiting To Disk");
+            for(int i=0; i<EchoServer.data.size(); i++){
+                int j = EchoServer.data.get(i);
+                EchoServer.dataDisk.add(j);
+            }
+            //Serializing data content
+            FileOutputStream file = new FileOutputStream(fileName);
+            ObjectOutputStream out = new ObjectOutputStream(file);
+            out.writeObject(EchoServer.dataDisk);
+            out.close();
+            file.close();
+            commitCheck = true;
+        }
+        catch(Exception e){
+            System.out.println("Couldn't commit at this time");
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace(System.err);
+        }
+        
+        if(check)
+            updateConintueslly(port, -1, -1, 'R');
+    }
+
+    /**
+     * 
+     * @param check 
+     */
+    private void callRollback(boolean check){
+        System.out.println("Calling Rollback");
+        EchoServer.data.clear();
+        for(int i=0; i<EchoServer.dataDisk.size(); i++){
+            int j = EchoServer.dataDisk.get(i);
+            EchoServer.data.add(j);
+        }
+        try{
+        FileInputStream file = new FileInputStream(fileName);
+        ObjectInputStream in = new ObjectInputStream(file);
+        Disk = (LinkedList<Integer>)(in.readObject());
+        //System.out.println("DESERIALIZED" + Disk);
+        EchoServer.data.clear();
+        for(int i=0; i<Disk.size(); i++){
+            int j = Disk.get(i);
+            EchoServer.data.add(j);
+        }
+        in.close();
+        file.close();
+        }
+        catch(Exception e){
+            System.out.println("Couldn't deserialized comitted file at this time");
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace(System.err);
+        }
+        rollbackCheck = true; //rollback has been called
+        
+        if(check)
+            updateConintueslly(port, -1, -1, 'R');
+        
+    }
     
     /**
      * Creates a timeStamp and puts in the memory log to keep track of'
