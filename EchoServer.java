@@ -3,8 +3,8 @@ package server;
 import java.net.ServerSocket;  // The server uses this to bind to a port
 import java.net.Socket;        // Incoming connections are represented as sockets
 import java.util.ArrayList;
-import java.util.Date;
-//import java.util.HashMap;
+import java.util.HashMap;
+
 import java.util.LinkedList;
 
 /**
@@ -16,67 +16,41 @@ import java.util.LinkedList;
  */
 public class EchoServer
 {
-    /** The server will listen on this port for client connections */
-    //public static final int SERVER_PORT = 8754;
-    
+   
+
     protected static boolean status = false;
-    
-    //protected static HashMap<Integer, LinkedList<Integer>> updates = new HashMap<>();
-    
-    /*time stamp variable*/
-    Date timeStamp;
     
     /*availablitity check*/
     protected boolean[] available; //might not need this
     
-    /*array list that contains all the servers*/
+     /** The server will listen on this port for client connections */
     protected static ArrayList<Integer> allServers = new ArrayList<Integer>(){
         {
             add(7951);
             add(6536);
-            add(9113);
         }
     };
     
     /*array list that contains memory logs*/
-    private static ArrayList<String[]> memoryLog;
+    protected static ArrayList<HashMap<String, String>> memoryLog = new ArrayList<>();
     
     /*linked list of integers*/
-    protected static LinkedList<Integer> data = new LinkedList<>();
 
+    protected static LinkedList<Integer> data = new LinkedList<>();
     
-    
-    /**replicate method.
-     * pushes new update to the server hashmap
-     */
-    private void replicate(String cIP){
-        
-        //Checks to see if we already have the client in the server
-       // if(!server.containsKey(cIP))
-//            server.put(cIP, this.data); //add client if we do
-//        else
-//            server.replace(cIP, this.data); //replace client data if we don't
-//        
-    }
-    
-    /**check method.
-     * checks if each server has the latest update
-     * (i.e compares the linked list of each server)
-     * @return true if the linked list of each server is the same
-     */
-    private boolean check(){
-        return true;
-        
-    }
-    
-    /**updateServer method.
-     * updates EchoClient command to  server and use replicate() to update the other servers
-     */
-//    public void updateServer(String cIP){
-//        replicate(cIP);
-//    }
+    protected static LinkedList<Integer> dataDisk = new LinkedList<>();
+
 //    
-    
+//    /**check method.
+//     * checks if each server has the latest update
+//     * (i.e compares the linked list of each server)
+//     * @return true if the linked list of each server is the same
+//     */
+//    private boolean check(){
+//        return true;
+//        
+//    }
+  
     /**
      * Main routine.Just a dumb loop that keeps accepting new
      * client connections.
@@ -102,7 +76,6 @@ public class EchoServer
             }
                 
             final ServerSocket serverSock = new ServerSocket(serverPort);
-	    System.out.println("Server started successfully .... ");
 	    // A simple infinite loop to accept connections
 	    Socket sock = null;
 	    EchoThread thread = null;
@@ -121,26 +94,26 @@ public class EchoServer
 	    e.printStackTrace(System.err);
 	}
         
-       
+
        
 
     }  //-- end main(String[])
     
+
     //Makes sure that all the servers are updated
-    protected static void intialUpdate(){
-        if( AllServers.allServers.size() == 1)
-            System.out.println("No updates needed");
-        else{
-            
-            LinkedList<Integer> original =  AllServers.updates.get( AllServers.allServers.get(0));
-            for(int i: original){
-                data.add(i);
-            }
-            
-            System.out.println("Inital Updates completed");
-        }
-        
-        
-    }
+//    protected static void intialUpdate(){
+//        if(allServers.size() == 1)
+//            System.out.println("No updates needed");
+//        else{
+//            
+//            for(int i: original){
+//                data.add(i);
+//            }
+//            
+//            System.out.println("Inital Updates completed");
+//        }
+//        
+//        
+//    }
     
 } //-- End class EchoServer
