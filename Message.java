@@ -8,7 +8,7 @@ package server;
  *
  *  
  */
-public class Message 
+public class Message implements java.io.Serializable
 {
     /** The text string encoded in this Message object */
     public String theMessage;
