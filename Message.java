@@ -23,6 +23,11 @@ public class Message implements java.io.Serializable
      * @param check
      *
      */
+    
+    public Message(String _msg){
+        theMessage = _msg;
+        
+    }
     public Message(String _msg, boolean check){
 	switch(_msg)
         {
@@ -32,8 +37,6 @@ public class Message implements java.io.Serializable
             case "R": theMessage = "Rollback"; break;
             
             case "V": theMessage = "Viewing data"; break;
-            
-            case "M": theMessage = "Memory Log being displayed"; break;
             
             default: 
                 theMessage = _msg;
