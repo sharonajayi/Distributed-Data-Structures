@@ -5,7 +5,6 @@ import java.io.ObjectInputStream;   // Used to read objects sent from the server
 import java.io.ObjectOutputStream;  // Used to write objects to the server
 import java.io.BufferedReader;      // Needed to read from the console (user input)
 import java.io.InputStreamReader;   // Needed to read from the console (user input)
-import java.util.LinkedList;
 import java.util.Scanner;
 
 
@@ -18,60 +17,54 @@ import java.util.Scanner;
  */
 public class EchoClient
 {
-    /**
-     *IP address for the client
-     */
-    public String clientIP;
-    
-    /**
-     * Server the client is connected to
-     */
-    //private EchoServer serv;
-    
-    public EchoClient(String IP){
-        this.clientIP = IP;
-    }
     
     /**rollback method.
      * loads the last committed version (only occurs once)
      * it can only be called once by the client
      */
-    protected void rollback(){
-        
+    protected static Message rollback(){
+        return new Message ("V", true);
     }
     
-    /** * view method.Retrieves the linked list data structure and prints 
+    /** 
+     * Retrieves the linked list data structure and prints 
      * it out the data the user had added in
-     * @return 
+     * @return sends message to print out the data in server
      */
     protected static Message view(){
-        return new Message("V");
+        return new Message("V", false);
     }
     
-    /**commit method.
-     *loads the latest version to the disk
-     * @return true if user wants to save the new version
+    protected static Message history(){
+        return new Message("M", false);
+    }
+
+    /**
+     * Sends a message to commit data in server to disk
+     * @return message to commit date
      */
-    protected boolean commit(){
-        return true;
+    
+    protected static Message commit(){
+        return new Message("C",true);
     }
     
     /**
-     * insert method.adds integer at a specified index
+     * Adds integer  value at a specified index
      * @param pos Index of the linked list
      * @param value Integer to be added
-     * @return 
+     * @return message to insert value at the defined position
      */
     protected static Message insert(int pos, int value){
-         return new Message(pos, value);
+         return new Message(pos, value,true);
     }
     
-    /** * delete method.removes a specified integer
+    /** 
+     * Send a delete message at the specified value
      * @param value Integer to be removed
-     * @return 
+     * @return the delete message
      */
     protected static Message delete(int value){
-         return new Message("D", value);
+         return new Message("D", value, true);
     }
     
     /**
@@ -81,7 +74,7 @@ public class EchoClient
      * @return 
      */
     protected static Message add(int value){ 
-        return new Message("A", value);
+        return new Message("A", value, true);
     }
     
     
@@ -113,19 +106,21 @@ public class EchoClient
 	    final ObjectInputStream input = new ObjectInputStream(sock.getInputStream());
             
             
-            //EchoClient c1 = new EchoClient(serverIP);
+
 	    // loop to send messages
 	    Message msg = null, resp = null;
             Message resp2 = null;
-//            System.out.println("Enter a line of text, or type \"EXIT\" to quit.");
-//	    System.out.print(" > ");
+
 	    do{
 		// Read and send message.  Since the Message class
 		// implements the Serializable interface, the
 		// ObjectOutputStream "output" object automatically
 		// encodes the Message object into a format that can
 		// be transmitted over the socket to the server.
-		msg = readSomeText(msg);
+
+
+		msg = userInput(msg);
+
 		output.writeObject(msg);   
                    
 		// Get ACK and print.  Since Message implements
@@ -173,67 +168,92 @@ public class EchoClient
 
     } //-- end readSomeText()
     
-    private static Message readSomeText(Message msg){
+    /**
+     * Interface that allows user to communicate to the server.
+     * @param msg
+     * @return the message sent to the server to execute
+     */
+    private static Message userInput(Message msg){
+
         try{
         System.out.println("Enter a line of text, or type \"EXIT\" to quit.");
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         Scanner sc = new Scanner(System.in);
-        System.out.println("Do you want to add data to the server? (y/n): ");
+
+        //******
+            System.out.println("Enter the corresponding letter to carry out an action");
+        System.out.println("To ADD data - A, To DELETE - D, To VIEW - V, To INSERT - I, To COMMIT - C, To Rollback - R, To View History - H");
         String request = sc.nextLine();
         if(request.equalsIgnoreCase("EXIT"))
-                return new Message(request);
-        if(request.equalsIgnoreCase("y")){
+                return new Message(request,false);
+        else if(request.equalsIgnoreCase("A")){
+
             System.out.println("Input your data: ");
             String ans = in.readLine();
             if(ans.equalsIgnoreCase("EXIT"))
-                return new Message(ans);
+                return new Message(ans,true);
             else {
                 int adding  = Integer.parseInt(ans);
                 
                 return add(adding);
             }
+        }
+        
+        else if(request.equalsIgnoreCase("D")){
 
-        }
         
-        System.out.println("Do you want to view your data in the server? (y/n): ");
-        request = sc.nextLine();
-        if(request.equalsIgnoreCase("EXIT"))
-            return new Message(request);
-        if(request.equalsIgnoreCase("y")){
-            return view();
-        }
-        
-        System.out.println("Do you want to delet your data in the server? (y/n): ");
-        request = sc.nextLine();
-        if(request.equalsIgnoreCase("EXIT"))
-            return new Message(request);
-        if(request.equalsIgnoreCase("y")){
+
             System.out.println("Enter location of the data you want to delete data: ");
             String ans = in.readLine();
             if(ans.equalsIgnoreCase("EXIT"))
-                return new Message(ans);
+                return new Message(ans, true);
             else {
                 int del  = Integer.parseInt(ans);
                 
-                return delete(del);
+
+                return delete(del -1);
             }
         }
         
+        else if(request.equalsIgnoreCase("V")){
+            return view();
+        
+        }
+        else if(request.equalsIgnoreCase("H")){
+            return history();
+        }
+        
+        else if(request.equalsIgnoreCase("I")){
+            System.out.println("Input your data");
+            String ans = in.readLine();
+            if(ans.equalsIgnoreCase("EXIT")){
+                return new Message(ans, true);
+            }
+            else {
+                System.out.println("Enter the location you want to place data");
+                String pos = in.readLine();
+                int ans2 = Integer.parseInt(ans);
+                int pos2 = Integer.parseInt(pos);
+                return insert(pos2,ans2);
+            }
+        }
+        
+        else if(request.equalsIgnoreCase("C")){
+            return commit();
+        }
+        else if(request.equalsIgnoreCase("R")){
+            return rollback();
+        }
+
+
         }
         catch(Exception e){
 	    // Uh oh...
-            msg = new Message ("");
+            msg = new Message ("Error occured with client command", false);
 	    return msg;
         }
         return msg;
-    }
+    } //-- end userInput()
     
-    public static void printData(LinkedList<Integer> d){
-        
-    }
-//    public String toString(){
-//        
-//        
-//    }
 
 } //-- end class EchoClient
