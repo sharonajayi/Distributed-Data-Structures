@@ -23,7 +23,8 @@ public class EchoClient
      * it can only be called once by the client
      */
     protected static Message rollback(){
-        return new Message ("V", true);
+        return new Message ("R",true);
+
     }
     
     /** 
@@ -32,6 +33,7 @@ public class EchoClient
      * @return sends message to print out the data in server
      */
     protected static Message view(){
+
         return new Message("V", false);
     }
     
@@ -56,6 +58,7 @@ public class EchoClient
      */
     protected static Message insert(int pos, int value){
          return new Message(pos, value,true);
+
     }
     
     /** 
@@ -118,8 +121,8 @@ public class EchoClient
 		// encodes the Message object into a format that can
 		// be transmitted over the socket to the server.
 
-
 		msg = userInput(msg);
+
 
 		output.writeObject(msg);   
                    
@@ -175,13 +178,14 @@ public class EchoClient
      */
     private static Message userInput(Message msg){
 
+
         try{
         System.out.println("Enter a line of text, or type \"EXIT\" to quit.");
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         Scanner sc = new Scanner(System.in);
 
         //******
-            System.out.println("Enter the corresponding letter to carry out an action");
+        System.out.println("Enter the corresponding letter to carry out an action");
         System.out.println("To ADD data - A, To DELETE - D, To VIEW - V, To INSERT - I, To COMMIT - C, To Rollback - R, To View History - H");
         String request = sc.nextLine();
         if(request.equalsIgnoreCase("EXIT"))
@@ -191,7 +195,8 @@ public class EchoClient
             System.out.println("Input your data: ");
             String ans = in.readLine();
             if(ans.equalsIgnoreCase("EXIT"))
-                return new Message(ans,true);
+                return new Message(ans, true);
+
             else {
                 int adding  = Integer.parseInt(ans);
                 
@@ -237,7 +242,6 @@ public class EchoClient
                 return insert(pos2,ans2);
             }
         }
-        
         else if(request.equalsIgnoreCase("C")){
             return commit();
         }

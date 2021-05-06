@@ -1,6 +1,11 @@
+
 package server;
 
 import java.io.EOFException;
+=======
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.Thread;            // We will extend Java's base Thread class
 import java.net.Socket;
 import java.io.ObjectInputStream;   // For reading Java objects off of the wire
@@ -13,6 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import java.util.LinkedList;
+
 
 
 
@@ -28,9 +36,13 @@ public class EchoThread extends Thread
     
 
     private final int port;                     //The port that we are connecnted to
-    
       
     Date time;/*time stamp variable*/
+
+    String fileName = "commit.ser";
+    protected static LinkedList<Integer> Disk = new LinkedList<>();
+    private boolean commitCheck = false; //commit has not been called yet
+    private boolean rollbackCheck = false; //rollback has not been called yet
 
     /**
      * Constructor that sets up the socket we'll chat over
@@ -71,7 +83,7 @@ public class EchoThread extends Thread
                 msg = (Message)input.readObject();
                 //Print where the socket is connected to and the message perfomed
 		System.out.println("[" + socket.getInetAddress() + ":" + socket.getPort() + "] " + msg.theMessage);
-                
+    
                 //Get the command from the server
                 char command = msg.theMessage.charAt(0);
                 
@@ -79,6 +91,7 @@ public class EchoThread extends Thread
                     //System.out.println("About to add");
                     add(msg.getVal(), msg.check);
                     createTimeStamp(msg.theMessage); //create a timestamp for memory log
+
                     if(msg.check)
                         output.writeObject(msg);
                     else
@@ -88,7 +101,6 @@ public class EchoThread extends Thread
                     //System.out.println("Printing data");
                     output.writeObject(new Message(view(), false));
                     createTimeStamp(msg.theMessage); //create a timestamp for memory log
-
                     
                 }
                 else if(Character.compare(command, 'D') == 0){
@@ -108,16 +120,38 @@ public class EchoThread extends Thread
                         output.writeObject(msg);
                     else
                         msg.theMessage = "EXIT"; msg.check = false;
+                } 
+                else if(Character.compare(command, 'M') == 0){
+                    output.writeObject(new Message(printMemoryLog(), false));
                 }
+                 
                 else if(Character.compare(command, 'R') ==0){
-                    System.out.println("Calling Rollback");
-                    EchoServer.data.clear();
-                    for(int i=0; i<EchoServer.dataDisk.size(); i++){
-                        int j = EchoServer.dataDisk.get(i);
-                        EchoServer.data.add(j);
+                    if(rollback()){
+                        System.out.println("Calling Rollback");
+                        EchoServer.data.clear();
+                        for(int i=0; i<EchoServer.dataDisk.size(); i++){
+                            int j = EchoServer.dataDisk.get(i);
+                            EchoServer.data.add(j);
+                        }
+                        FileInputStream file = new FileInputStream(fileName);
+                        ObjectInputStream in = new ObjectInputStream(file);
+                        Disk = (LinkedList<Integer>)in.readObject();
+                        //System.out.println("DESERIALIZED" + Disk);
+                        EchoServer.data.clear();
+                        for(int i=0; i<Disk.size(); i++){
+                            int j = Disk.get(i);
+                            EchoServer.data.add(j);
+                        }
+                        in.close();
+                        file.close();
+                        rollbackCheck = true; //rollback has been called
+                        createTimeStamp(msg.theMessage); //create a timestamp for memory log
+                        output.writeObject(msg);
                     }
-                    
-                    createTimeStamp(msg.theMessage); //create a timestamp for memory log
+                    else if(!rollback()){
+                        //System.out.println("Rollback can occur only one time/ User has not commited any data");
+                        output.writeObject(new Message("Rollback can occur only one time OR User has not commited any data"));
+                    }
                 }
                 else if(Character.compare(command, 'C') ==0){
                     if(commit()){
@@ -127,23 +161,20 @@ public class EchoThread extends Thread
                             int j = EchoServer.data.get(i);
                             EchoServer.dataDisk.add(j);
                         }
-                        
+                        //Serializing data content
+                        FileOutputStream file = new FileOutputStream(fileName);
+                        ObjectOutputStream out = new ObjectOutputStream(file);
+                        out.writeObject(EchoServer.dataDisk);
+                        out.close();
+                        file.close();
+                        commitCheck = true;
                         createTimeStamp(msg.theMessage); //create a timestamp for memory log
-                        if(msg.check)
-                            output.writeObject(msg);
-                        else
-                            msg.theMessage = "EXIT"; msg.check = false;
-                        }
-                    else if(!commit()){
-                        System.out.println("Cannot commit at this time");
-                        if(msg.check)
-                            output.writeObject(msg);
-                        else
-                            msg.theMessage = "EXIT"; msg.check = false;
+                        output.writeObject(msg);
                     }
-                }
-                else if(Character.compare(command, 'M') == 0){
-                    output.writeObject(new Message(printMemoryLog(), false));
+                    else if(!commit()){
+                        //System.out.println("Cannot commit at this time");
+                        output.writeObject(new Message("Cannot commit at this time"));
+                    }
                 }
                 
 		// Write an ACK back to the sender
@@ -190,7 +221,6 @@ public class EchoThread extends Thread
     private void add(int value, boolean check){
         
         EchoServer.data.add(value);
-        //System.out.println(value + " was added");
         if(!EchoServer.data.contains(value)){
             System.out.println(value + " was not added in the data");
         }
@@ -200,6 +230,7 @@ public class EchoThread extends Thread
             updateConintueslly(port, value, -1, 'A');
        }
     } //--add()
+
     
     /**
      * Delete data from the location specified
@@ -211,12 +242,12 @@ public class EchoThread extends Thread
         if(EchoServer.data.contains(value)){
             System.out.println(value + " was not remove from data");
         }
-
         //pushes the update to other open servers if this is a client request
         if(check)
             updateConintueslly(port, value, -1, 'D');
 
     } //--delete()
+
     
     /**
      * Creates a string that would display the data currently in the server
@@ -324,6 +355,7 @@ public class EchoThread extends Thread
         return str.toString();
     } //--printMemoryLog()
     
+
     /**
      * 
      * @param port that the socket connects to
@@ -331,11 +363,59 @@ public class EchoThread extends Thread
      * @param postion position to add the value at (-1 if there is no position specified
      * @param command what command pushed to the other servers
      */
+
+
+    private void insert(int pos, int value, boolean check){
+        EchoServer.data.add(pos, value);
+        
+        if(check){ 
+            //System.out.println("Update the other servers");
+            updateConintueslly(port, value, -1, 'A');
+       }
+    }
+    
+    private boolean commit(){ //Needs a little bit of working
+        if(EchoServer.data.isEmpty() &&EchoServer.dataDisk.isEmpty() ){
+            return false;
+        }
+        else if(!EchoServer.data.isEmpty() && EchoServer.dataDisk.isEmpty()){
+            return true;
+        }
+        else if(EchoServer.data.isEmpty() && !EchoServer.dataDisk.isEmpty()){
+            return false;
+        }
+        else if(!EchoServer.data.isEmpty() && !EchoServer.dataDisk.isEmpty()
+                && EchoServer.data.size() == EchoServer.dataDisk.size()){
+            for(int i = 0; i < EchoServer.data.size(); i++){
+                if(EchoServer.data.get(i) != EchoServer.dataDisk.get(i))
+                    return true;
+               
+            }
+        }
+        else if (EchoServer.data.size()!= EchoServer.dataDisk.size())
+            return true;
+        
+        return false;
+    }
+    
+   private boolean rollback(){
+        if (commitCheck && rollbackCheck){
+            return false;
+        }
+        else if(!commitCheck){
+            return false;
+        }
+        else if(commitCheck && !rollbackCheck){
+            return true;
+        }
+        
+        return false;
+        }
+
     private void updateConintueslly(int port, int value, int postion, char command){
         if(EchoServer.allServers.size() != 1){
             for (Integer ports : EchoServer.allServers) {
                 if(ports != port) {
-                    
                     if(command== 'A'){        //send an add message to server
                         update(new Message("A", value, true), ports);
                     }
@@ -350,6 +430,7 @@ public class EchoThread extends Thread
                     else if(command =='R'){  //send a rollback command to server
                         update(new Message("R", true), ports);
                     }
+
                     else
                         System.out.println("Command to update was invalid");
                     
@@ -358,6 +439,7 @@ public class EchoThread extends Thread
         }
         
     } //--updateContinuseslly()
+
     
     /**
      * Opens a socket connection to push a message to other servers
@@ -423,6 +505,7 @@ public class EchoThread extends Thread
             in.close();
             out.close();
             serverSock.close();
+
             
         }
         catch(EOFException ef){
@@ -434,11 +517,5 @@ public class EchoThread extends Thread
         }
     } //--update()
 
-
-        
-        
-        
-
-    
 
 } //-- end class EchoThread

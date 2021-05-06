@@ -8,7 +8,7 @@ package server;
  *
  *  
  */
-public class Message implements java.io.Serializable
+public class Message 
 {
     /** The text string encoded in this Message object */
     public String theMessage;
@@ -23,6 +23,13 @@ public class Message implements java.io.Serializable
      * @param check
      *
      */
+
+    
+    public Message(String _msg){
+        theMessage = _msg;
+        
+    }
+  
     public Message(String _msg, boolean check){
 	switch(_msg)
         {

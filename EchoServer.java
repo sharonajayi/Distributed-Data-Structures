@@ -5,6 +5,7 @@ import java.net.Socket;        // Incoming connections are represented as socket
 import java.util.ArrayList;
 import java.util.HashMap;
 
+
 import java.util.LinkedList;
 
 /**
@@ -14,11 +15,8 @@ import java.util.LinkedList;
  *
  * 
  */
-public class EchoServer
+public class EchoServer 
 {
-   
-
-    protected static boolean status = false;
     
     /*availablitity check*/
     protected boolean[] available; //might not need this
@@ -28,6 +26,7 @@ public class EchoServer
         {
             add(7951);
             add(6536);
+
         }
     };
     
@@ -49,8 +48,7 @@ public class EchoServer
 //    private boolean check(){
 //        return true;
 //        
-//    }
-  
+
     /**
      * Main routine.Just a dumb loop that keeps accepting new
      * client connections.
@@ -99,21 +97,5 @@ public class EchoServer
 
     }  //-- end main(String[])
     
-
-    //Makes sure that all the servers are updated
-//    protected static void intialUpdate(){
-//        if(allServers.size() == 1)
-//            System.out.println("No updates needed");
-//        else{
-//            
-//            for(int i: original){
-//                data.add(i);
-//            }
-//            
-//            System.out.println("Inital Updates completed");
-//        }
-//        
-//        
-//    }
     
 } //-- End class EchoServer
