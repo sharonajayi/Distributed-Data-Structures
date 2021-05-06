@@ -1,8 +1,6 @@
-
 package server;
 
 import java.io.EOFException;
-import java.io.IOException;
 import java.lang.Thread;            // We will extend Java's base Thread class
 import java.net.Socket;
 import java.io.ObjectInputStream;   // For reading Java objects off of the wire
@@ -11,9 +9,9 @@ import java.io.ObjectOutputStream;  // For writing Java objects to the wire
 
 
 /**
- * Marian Zaki (COSC 2354)
- * A simple server thread.  This class just echoes the messages sent
- * over the socket until the socket is closed.
+ * Nadine Ineza and Sharon Ajayi (COSC 2354)
+ * A simple server thread.  This class performs the commands the client 
+ * (Echo Client) sends to the server (EchoSever)
  *
  */
 public class EchoThread extends Thread
@@ -38,7 +36,8 @@ public class EchoThread extends Thread
 
     /**
      * run() is basically the main method of a thread.  This thread
-     * simply reads Message objects off of the socket.
+     * simply reads Message sent by socket and executes the command if it can or
+     * prints out the message received to the client.
      *
      */
     @Override
@@ -59,14 +58,14 @@ public class EchoThread extends Thread
 	    do{
 		// read and print message
                 msg = (Message)input.readObject();
-
+                //Print where the socket is connected to and the message perfomed
 		System.out.println("[" + socket.getInetAddress() + ":" + socket.getPort() + "] " + msg.theMessage);
+                
+                //Get the command from the server
                 char command = msg.theMessage.charAt(0);
-
                 
-                
-                if(Character.compare(command, 'A') == 0){
-                    System.out.println("About to add");
+                if(Character.compare(command, 'A') == 0){ //executes add
+                    //System.out.println("About to add");
                     add(msg.getVal(), msg.check);
                     if(msg.check)
                         output.writeObject(msg);
@@ -74,27 +73,26 @@ public class EchoThread extends Thread
                         msg.theMessage = "EXIT"; msg.check = false;
                 }
                 else if(Character.compare(command, 'V') == 0){
-                    System.out.println("Printing data");
+                    //System.out.println("Printing data");
                     output.writeObject(new Message(view(), false));
 
                     
                 }
                 else if(Character.compare(command, 'D') == 0){
-                    System.out.println("Deleting");
-
+                    //System.out.println("Deleting");
                     delete(msg.getVal(), msg.check);
                     if(msg.check)
                         output.writeObject(msg);
                     else
-                        output.writeObject(new Message("Finished", false));
+                        msg.theMessage = "EXIT"; msg.check = false;
                 }
                 else if(Character.compare(command, 'I') ==0){
-                    System.out.println("Inserting");
+                    //System.out.println("Inserting");
                     insert(msg.getPos(), msg.getVal(), msg.check);
                     if(msg.check)
                         output.writeObject(msg);
                     else
-                        output.writeObject(new Message("Finished", false));
+                        msg.theMessage = "EXIT"; msg.check = false;
                 }
                 else if(Character.compare(command, 'R') ==0){
                     System.out.println("Calling Rollback");
@@ -112,17 +110,18 @@ public class EchoThread extends Thread
                             int j = EchoServer.data.get(i);
                             EchoServer.dataDisk.add(j);
                         }
-                        String fileName = "commit.ser";
-                        FileOutputStream file = new FileOutputStream(fileName);
-                        ObjectOutputStream out = new ObjectOutputStream(file);
-                        out.writeObject(EchoServer.dataDisk);
-                        out.close();
-                        file.close();
-                        output.writeObject(msg);
-                    }
+                        
+                        if(msg.check)
+                            output.writeObject(msg);
+                        else
+                            msg.theMessage = "EXIT"; msg.check = false;
+                        }
                     else if(!commit()){
                         System.out.println("Cannot commit at this time");
-                        output.writeObject(msg);
+                        if(msg.check)
+                            output.writeObject(msg);
+                        else
+                            msg.theMessage = "EXIT"; msg.check = false;
                     }
                 }
                 
@@ -159,7 +158,12 @@ public class EchoThread extends Thread
 
     }  //-- end run()
     
-    
+    /**
+     * Adds data to a server linked list and pushes that to the other open
+     * servers.
+     * @param value data that is added
+     * @param check checks to see if this is a client request
+     */
     private void add(int value, boolean check){
         
         EchoServer.data.add(value);
@@ -168,23 +172,33 @@ public class EchoThread extends Thread
             System.out.println(value + " was not added in the data");
         }
         
+        //pushes the update to other open servers if this is a client request
        if(check){ 
-            //System.out.println("Update the other servers");
             updateConintueslly(port, value, -1, 'A');
        }
-    }
+    } //--add()
     
+    /**
+     * Delete data from the location specified
+     * @param value location of the data deleted
+     * @param check if this was called by a client(true) or server (false)
+     */
     private void delete(int value, boolean check){
         EchoServer.data.remove(value);
         if(EchoServer.data.contains(value)){
             System.out.println(value + " was not remove from data");
         }
 
+        //pushes the update to other open servers if this is a client request
         if(check)
             updateConintueslly(port, value, -1, 'D');
 
-    }
+    } //--delete()
     
+    /**
+     * Creates a string that would display the data currently in the server
+     * @return the string version of the data
+     */
     private String view(){
         StringBuilder str = new StringBuilder();
         for(int i = 0; i < EchoServer.data.size(); i++){
@@ -202,19 +216,28 @@ public class EchoThread extends Thread
         }
         
         return str.toString();
-    }
+    } //--view()
     
-
+    /**
+     * Insert data at the specified position in the server
+     * @param pos where data is inserted
+     * @param value data that is inserted
+     * @param check checks if a client(true) or server(false) called this method
+     */
     private void insert(int pos, int value, boolean check){
         EchoServer.data.add(pos, value);
         
+        //pushes the update to other open servers if this is a client request
         if(check){ 
-            //System.out.println("Update the other servers");
             updateConintueslly(port, value, -1, 'A');
        }
-    }
+    } //--insert()
     
-    private boolean commit(){ //Needs a little bit of working
+    /**
+     * Checks if you can commit the data currently into disk
+     * @return true if you can commit and false if you can't
+     */
+    private boolean commit(){ 
         if(EchoServer.data.isEmpty() &&EchoServer.dataDisk.isEmpty() ){
             return false;
         }
@@ -236,39 +259,42 @@ public class EchoThread extends Thread
             return true;
         
         return false;
-    }
+    } //--commit()
     
-   private boolean rollback(){
-        if (EchoServer.dataDisk.isEmpty()){
-            return false;
-        }
-        
+    /**
+     * Determines if server can rollback pervious version committed to disk 
+     * @return 
+     */
+    private boolean rollback(){
         return false;
-        }
+    } //--rollack()
     
-    private boolean commitCheck(){
-        if (EchoServer.dataDisk.isEmpty()){
-            return true;
-        }
-        return false;
-    }
-    
-    private boolean rollbackCheck(){
-        return false;
-    }
+    /**
+     * 
+     * @param port that the socket connects to
+     * @param value being added by the server
+     * @param postion position to add the value at (-1 if there is no position specified
+     * @param command what command pushed to the other servers
+     */
     private void updateConintueslly(int port, int value, int postion, char command){
         if(EchoServer.allServers.size() != 1){
             for (Integer ports : EchoServer.allServers) {
                 if(ports != port) {
-                    //Remove the data from updates and add the new value
-                    if(command== 'A'){
+                    
+                    if(command== 'A'){        //send an add message to server
                         update(new Message("A", value, true), ports);
                     }
-                    else if(command == 'D'){
+                    else if(command == 'D'){  //send a delete message to server
                         update(new Message("D", value, true), ports);
                     } 
-                    else if(command == 'I' && postion != -1)
+                    else if(command == 'I' && postion != -1) //send an insert message to server
                         update(new Message(postion, value,true), ports);
+                    else if(command == 'C'){  //send a commit command to the server
+                        update(new Message("C", true), ports);
+                    }
+                    else if(command =='R'){  //send a rollback command to server
+                        update(new Message("R", true), ports);
+                    }
                     else
                         System.out.println("Command to update was invalid");
                     
@@ -276,51 +302,71 @@ public class EchoThread extends Thread
             }
         }
         
-    }
+    } //--updateContinuseslly()
     
+    /**
+     * Opens a socket connection to push a message to other servers
+     * @param msg message being pushed to the serve
+     * @param portTO port the socket is connecting to
+     */
     private void update(Message msg, int portTO){
-        //System.out.println("Starting the update");
-        boolean status = false; Message tmpMsg = null;
         try{
+            //Open the socket connection to the server
             final Socket serverSock = new Socket("localhost", portTO);
             System.out.println("Connected to " + serverSock.getInetAddress() + " on port " + portTO + 
                 " LocalPort number is: " +serverSock.getLocalPort());
+            
+            //Open I/O stream
             final ObjectOutputStream out = new ObjectOutputStream(serverSock.getOutputStream());
             final ObjectInputStream in = new ObjectInputStream(serverSock.getInputStream());
- 
+            
+            //Get the command server needs to execute
             char command = msg.theMessage.charAt(0);
-            System.out.println("Command is: " + command);
+            //System.out.println("Command is: " + command);
+            
+            //Sends an add message to the server connected to 
             if(Character.compare(command, 'A') == 0 && msg.check){
                 System.out.println("Adding");
                 System.out.println("Message sending: " + msg.theMessage);
-                msg.check = false;
+                msg.check = false; //identify that a server sent this message
                 out.writeObject(msg);
-                status = true;
-                System.out.println("status = " + status);
             }
+            //sends an insert command to the server connected to
             else if(Character.compare(command, 'I') == 0 && msg.check){
                 System.out.println("Commiting data");
-                msg.check = false;
+                msg.check = false; //identify that a server sent this message
                 out.writeObject(msg);
-                status = true;
 
             }
+            //sends a delete command to the server connected to
             else if(Character.compare(command, 'D') == 0 && msg.check){
                 System.out.println("Deleting");
-                msg.check = false;
+                msg.check = false;//identify that a server sent this message
                 out.writeObject(msg);
-                status = true;
             }
+            //sends a command command to the server connected to
+            else if(Character.compare(command, 'C') == 0 && msg.check){
+                System.out.println("Committing");
+                msg.check = false;//identify that a server sent this message
+                out.writeObject(msg);
+            }
+            //sends a rollback command to the server connected to
+            else if(Character.compare(command, 'R') == 0 && msg.check){
+                System.out.println("Rollbacking");
+                msg.check = false;//identify that a server sent this message
+                out.writeObject(msg);
+            }
+            //sanity check if command is not understood by the server
             else{
                 System.out.println("Message recieved is :" + msg.theMessage);
-                out.writeObject(new Message("Nonsense", false));
-                status = false;
-                System.out.println("status = " + status);
+                out.writeObject(new Message("Unable to understand command sent", false)); //identify that a server sent this message
             }
-           System.out.println("** Closing connection with " + serverSock.getInetAddress() + ":" + serverSock.getPort() + " **");
+            
+            //Close and clean up the connections open
+            System.out.println("** Closing connection with " + serverSock.getInetAddress() + ":" + serverSock.getPort() + " **");
             in.close();
             out.close();
-             serverSock.close();
+            serverSock.close();
             
         }
         catch(EOFException ef){
@@ -330,7 +376,11 @@ public class EchoThread extends Thread
             System.err.println("Error: " + e.getMessage());
 	    e.printStackTrace(System.err);
         }
-    }    
+    } //--update()
+        
+        
+        
+
+    
 
 } //-- end class EchoThread
-
