@@ -11,10 +11,10 @@ package server;
 public class Message implements java.io.Serializable
 {
     /** The text string encoded in this Message object */
-    public String theMessage;
-    private int val;
-    private int pos;
-    public boolean check;
+    public String theMessage; //command being called
+    private int val; //value being add
+    private int pos; //position to add the value
+    public boolean check; //determines whether a client or server is calling this command
 
     /**Constructor
      *
@@ -25,10 +25,10 @@ public class Message implements java.io.Serializable
         
     }
   
-    /**Constructor
+    /**Constructor for the commit, rollback, view, history, and other messages
      *
      * @param _msg The string to be encoded in this Message object
-     * @param check
+     * @param check determines whether a client and server are sending the command
      */
     public Message(String _msg, boolean check){
 	switch(_msg)
@@ -51,11 +51,11 @@ public class Message implements java.io.Serializable
         
     }
     
-    /**Constructor
+    /**Constructor for the add and delete command
      *
-     * @param met
+     * @param met Determines which command is being call
      * @param value The integer to be encoded in this Message object
-     * @param check
+     * @param check determines whether this is from the client or server
      */
     public Message(String met, int value, boolean check){
         this.val = value;
@@ -71,11 +71,11 @@ public class Message implements java.io.Serializable
         this.check = check;
     }
     
-    /**Constructor
+    /**Constructor that is used for the insert command
      *
-     * @param pos
+     * @param pos position to insert the value at
      * @param value The integer to be encoded in this Message object
-     * @param check
+     * @param check determines whether this was from the client or server
      */
     public Message(int pos, int value, boolean check){
         this.pos = pos;

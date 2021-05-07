@@ -30,7 +30,7 @@ public class EchoThread extends Thread implements Serializable {
 
     Date time;/*time stamp variable*/
 
-    String fileName = "commit.ser";
+    String fileName = "commit.ser"; //file data is serialized to
     protected static LinkedList<Integer> Disk = new LinkedList<>();
     private boolean commitCheck = false; //commit has not been called yet
     private boolean rollbackCheck = false; //rollback has not been called yet
@@ -87,11 +87,11 @@ public class EchoThread extends Thread implements Serializable {
                         msg.theMessage = "EXIT";
                     }
                     msg.check = false;
-                } else if (Character.compare(command, 'V') == 0) {
+                } else if (Character.compare(command, 'V') == 0) {  //executes view
                     output.writeObject(new Message(view(), false));
                     createTimeStamp(msg.theMessage); //create a timestamp for memory log
 
-                } else if (Character.compare(command, 'D') == 0) {
+                } else if (Character.compare(command, 'D') == 0) { //executes delete
                     delete(msg.getVal(), msg.check);
                     createTimeStamp(msg.theMessage); //create a timestamp for memory log
                     if (msg.check) {
@@ -100,7 +100,7 @@ public class EchoThread extends Thread implements Serializable {
                         msg.theMessage = "EXIT";
                     }
                     msg.check = false;
-                } else if (Character.compare(command, 'I') == 0) {
+                } else if (Character.compare(command, 'I') == 0) { //executes insert
                     insert(msg.getPos(), msg.getVal(), msg.check);
                     createTimeStamp(msg.theMessage); //create a timestamp for memory log
                     if (msg.check) {
@@ -109,7 +109,7 @@ public class EchoThread extends Thread implements Serializable {
                         msg.theMessage = "EXIT";
                     }
                     msg.check = false;
-                } else if (Character.compare(command, 'M') == 0) {
+                } else if (Character.compare(command, 'M') == 0) { //executes history
                     output.writeObject(new Message(printMemoryLog(), false));
                 } else if (Character.compare(command, 'R') == 0) {
                     if (rollback()) {
@@ -129,7 +129,7 @@ public class EchoThread extends Thread implements Serializable {
                         }
                         msg.check = false;
                     }
-                } else if (Character.compare(command, 'C') == 0) {
+                } else if (Character.compare(command, 'C') == 0) { //executes commit
                     if (commit()) {
                         callCommit(msg.check);
                         createTimeStamp(msg.theMessage); //create a timestamp for memory log
@@ -277,8 +277,8 @@ public class EchoThread extends Thread implements Serializable {
     } //--commit()
 
     /**
-     *
-     * @param check
+     * Enacts the commit command
+     * @param check true if the client is calling this command
      */
     private void callCommit(boolean check) {
         EchoServer.dataDisk.clear();
@@ -307,8 +307,8 @@ public class EchoThread extends Thread implements Serializable {
     }
     
     /**
-     * 
-     * @return 
+     * Check if you can execute a rollback command
+     * @return true if you can rollback latest commit
      */
     private boolean rollback() {
         if (commitCheck && rollbackCheck) {
@@ -323,8 +323,8 @@ public class EchoThread extends Thread implements Serializable {
     }
     
     /**
-     *
-     * @param check
+     * Implements the rollback command
+     * @param check true if you can rollback latest commit
      */
     private void callRollback(boolean check) {
         System.out.println("Calling Rollback");
@@ -357,7 +357,7 @@ public class EchoThread extends Thread implements Serializable {
      * Creates a timeStamp and puts in the memory log to keep track of' commands
      * sent to the servers by client or other server
      *
-     * @param msg
+     * @param msg command that was just executed
      */
     private void createTimeStamp(String msg) {
         DateFormat form = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
@@ -369,8 +369,8 @@ public class EchoThread extends Thread implements Serializable {
     } //--createTimeStamp()
     
     /**
-     * 
-     * @return 
+     * Prints the memory log
+     * @return the string form of the memory log
      */
     private String printMemoryLog() {
         StringBuilder str = new StringBuilder();
