@@ -154,27 +154,7 @@ public class EchoClient
     } //-- end main(String[])
 
 
-//    /**
-//     * Simple method to print a prompt and read a line of text.
-//     *
-//     * @return A line of text read from the console
-//     */
-//    private static String readSomeText()
-//    {
-//	try{
-//	    System.out.println("Enter a line of text, or type \"EXIT\" to quit.");
-//	    System.out.print(" > ");
-//            System.out.println("First run");
-//            
-//	    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-//	    return in.readLine();
-//	}
-//	catch(Exception e){
-//	    // Uh oh...
-//	    return "";
-//	}
-//
-//    } //-- end readSomeText()
+
     
     /**
      * Interface that allows user to communicate to the server.
