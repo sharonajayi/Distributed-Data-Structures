@@ -9,8 +9,10 @@ Now the servers and clients are up and running.
 
 To ADD data - type in A/a (letter case doesn't matter)
 To DELETE - type in D/d (letter case doesn't matter)
+~~elment location Starts at 1
 To VIEW - type in V/v (letter case doesn't matter)
 To INSERT - type in I/i (letter case doesn't matter)
+~~element location starts at 0
 To COMMIT - type in C/c (letter case doesn't matter)
 To ROLLBACK - type in R/r (letter case doesn't matter)
 To View History - type in H/h (letter case doesn't matter)
