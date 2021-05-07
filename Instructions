@@ -1,1 +1,20 @@
 Instructions on how to run the program.
+To run this properly Four terminals are needed. Two for the servers and two for the clients.
+Complie the code.
+To run the server1: java server.EchoServer 6536
+           server2: java server.EchoServer 7951
+To run client1 and connect to the server: java server.EchoClient 6536
+       client2 and connect to the server: java server.EchoClient 7951
+Now the servers and clients are up and running.
+
+To ADD data - type in A/a (letter case doesn't matter)
+To DELETE - type in D/d (letter case doesn't matter)
+To VIEW - type in V/v (letter case doesn't matter)
+To INSERT - type in I/i (letter case doesn't matter)
+To COMMIT - type in C/c (letter case doesn't matter)
+To ROLLBACK - type in R/r (letter case doesn't matter)
+To View History - type in H/h (letter case doesn't matter)
+
+Things to note:
+~You can only rollback once.
+~If you don't have any data submited you can't commit.
