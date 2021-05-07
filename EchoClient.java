@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 
 /**
- * Marian Zaki (COSC 2354)
+ * Nadine Ineza and Sharon Ajayi (COSC 2354)
  * Simple client class.  This class connects to an EchoServer to send
  * text back and forth.  Java message serialization is used to pass
  * Message objects around.
@@ -37,6 +37,11 @@ public class EchoClient
         return new Message("V", false);
     }
     
+    /**
+     *Takes the past actions done on the linked list data
+     * structure and prints it out
+     * @return sends message to print out the data in server
+     */
     protected static Message history(){
         return new Message("M", false);
     }
@@ -149,27 +154,27 @@ public class EchoClient
     } //-- end main(String[])
 
 
-    /**
-     * Simple method to print a prompt and read a line of text.
-     *
-     * @return A line of text read from the console
-     */
-    private static String readSomeText()
-    {
-	try{
-	    System.out.println("Enter a line of text, or type \"EXIT\" to quit.");
-	    System.out.print(" > ");
-            System.out.println("First run");
-            
-	    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-	    return in.readLine();
-	}
-	catch(Exception e){
-	    // Uh oh...
-	    return "";
-	}
-
-    } //-- end readSomeText()
+//    /**
+//     * Simple method to print a prompt and read a line of text.
+//     *
+//     * @return A line of text read from the console
+//     */
+//    private static String readSomeText()
+//    {
+//	try{
+//	    System.out.println("Enter a line of text, or type \"EXIT\" to quit.");
+//	    System.out.print(" > ");
+//            System.out.println("First run");
+//            
+//	    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+//	    return in.readLine();
+//	}
+//	catch(Exception e){
+//	    // Uh oh...
+//	    return "";
+//	}
+//
+//    } //-- end readSomeText()
     
     /**
      * Interface that allows user to communicate to the server.

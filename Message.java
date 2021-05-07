@@ -1,7 +1,7 @@
 package server;
 
 /**
- * Marian Zaki (COSC 2354)
+ * Nadine Ineza and Sharon Ajayi (COSC 2354)
  * Very primitive-simple message class.  By implementing the Serializble
  * interface, objects of this class can be serialized automatically by
  * Java to be sent across IO streams.  
@@ -16,20 +16,20 @@ public class Message implements java.io.Serializable
     private int pos;
     public boolean check;
 
-    /**
-     * Constructor.
+    /**Constructor
      *
      * @param _msg The string to be encoded in this Message object
-     * @param check
-     *
      */
-
-    
     public Message(String _msg){
         theMessage = _msg;
         
     }
   
+    /**Constructor
+     *
+     * @param _msg The string to be encoded in this Message object
+     * @param check
+     */
     public Message(String _msg, boolean check){
 	switch(_msg)
         {
@@ -51,6 +51,12 @@ public class Message implements java.io.Serializable
         
     }
     
+    /**Constructor
+     *
+     * @param met
+     * @param value The integer to be encoded in this Message object
+     * @param check
+     */
     public Message(String met, int value, boolean check){
         this.val = value;
        
@@ -65,6 +71,12 @@ public class Message implements java.io.Serializable
         this.check = check;
     }
     
+    /**Constructor
+     *
+     * @param pos
+     * @param value The integer to be encoded in this Message object
+     * @param check
+     */
     public Message(int pos, int value, boolean check){
         this.pos = pos;
         this.val = value;
@@ -73,10 +85,18 @@ public class Message implements java.io.Serializable
         this.check = check;
     }
 
+    /**
+     *gets val
+     * @return val
+     */
     public int getVal() {
         return val;
     }
 
+    /**
+     *gets pos
+     * @return pos
+     */
     public int getPos() {
         return pos;
     }

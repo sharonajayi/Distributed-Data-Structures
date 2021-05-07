@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 /**
- * Marian Zaki (COSC 2354)
+ * Nadine Ineza and Sharon Ajayi (COSC 2354)
  * A simple server class.  Accepts client connections and forks
  * EchoThreads to handle the bulk of the work.
  *
@@ -39,15 +39,7 @@ public class EchoServer
     
     protected static LinkedList<Integer> dataDisk = new LinkedList<>();
 
-//    
-//    /**check method.
-//     * checks if each server has the latest update
-//     * (i.e compares the linked list of each server)
-//     * @return true if the linked list of each server is the same
-//     */
-//    private boolean check(){
-//        return true;
-//        
+        
 
     /**
      * Main routine.Just a dumb loop that keeps accepting new
